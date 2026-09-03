@@ -222,5 +222,43 @@ export const DEMO_PRESETS = [
       medical_necessity_indicator: true,
       bundling_indicator: false
     }
+  },
+  {
+    id: "preset_non_reference",
+    title: "Warning: Non-Reference Codes",
+    subtitle: "Non-reference CPT (99999) & ICD (Z99.9) codes",
+    expectedOutcome: "VALIDATION_WARNINGS (Allowed)",
+    badgeColor: "border-yellow-500/40 text-yellow-300 bg-yellow-500/10",
+    data: {
+      claim_id: "CLM_DEMO_06",
+      patient_id: "PAT_554812",
+      payer_id: "PAYER_001",
+      cpt_codes: ["99999"],
+      icd_codes: ["Z99.9"],
+      claim_amount: 350.0,
+      service_date: "2026-08-25",
+      prior_auth_flag: true,
+      eligibility_verified: true,
+      days_since_eligibility_check: 7,
+      provider_specialty: "General Practice",
+      documentation_complete: true,
+      duplicate_candidate: false,
+      timely_filing_risk: false,
+      coverage_indicator: true,
+      medical_necessity_indicator: true,
+      bundling_indicator: false
+    }
   }
 ];
+
+export const REFERENCE_CPT_CODES = [
+  "99213", "99214", "99215", "99203", "99204",
+  "71045", "71046", "93000", "36415", "80053",
+  "85025", "97110", "97140", "29881", "43239", "45380"
+];
+
+export const REFERENCE_ICD_CODES = [
+  "I10", "E11.9", "M54.5", "J06.9", "M17.11",
+  "K21.9", "F41.1", "E78.5", "R05", "Z00.00"
+];
+

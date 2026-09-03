@@ -91,3 +91,24 @@ def test_soft_warnings_unverified_eligibility_and_incomplete_docs():
     warning_codes = [w.code for w in result.warnings]
     assert "UNVERIFIED_ELIGIBILITY" in warning_codes
     assert "INCOMPLETE_DOCUMENTATION" in warning_codes
+
+def test_non_reference_codes_generate_warnings_while_valid():
+    claim = ClaimCreate(
+        claim_id="CLM_TEST_006",
+        patient_id="PAT_001",
+        payer_id="PAYER_001",
+        cpt_codes=["99999"],
+        icd_codes=["Z99.9"],
+        claim_amount=120.0,
+        service_date="2026-08-20",
+        prior_auth_flag=True,
+        eligibility_verified=True,
+        documentation_complete=True
+    )
+    result = validate_claim_deterministic(claim)
+    assert result.is_valid is True
+    warning_codes = [w.code for w in result.warnings]
+    assert "NON_REFERENCE_PROCEDURE_CODE" in warning_codes
+    assert "NON_REFERENCE_DIAGNOSIS_CODE" in warning_codes
+    assert any("non-reference" in w.message.lower() for w in result.warnings)
+

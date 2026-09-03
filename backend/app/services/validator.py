@@ -110,20 +110,20 @@ def validate_claim_deterministic(claim: ClaimCreate, existing_claim_ids: Optiona
             hard_error="Claim must contain at least one diagnosis (ICD-10) code."
         )
 
-    # 6. Soft Warnings: Unknown CPT codes
+    # 6. Soft Warnings: Unknown / Non-reference CPT codes
     for cpt in claim.cpt_codes:
         if cpt not in REFERENCE_CPT_CODES:
             warnings.append(ValidationWarning(
-                code="UNKNOWN_PROCEDURE_CODE",
-                message=f"CPT code '{cpt}' is not present in the demo reference set. Standard validation applied."
+                code="NON_REFERENCE_PROCEDURE_CODE",
+                message=f"Validation Warning: Non-reference code detected. CPT procedure code '{cpt}' is not present in the demo reference set. Allowed with warning."
             ))
 
-    # 7. Soft Warnings: Unknown ICD codes
+    # 7. Soft Warnings: Unknown / Non-reference ICD codes
     for icd in claim.icd_codes:
         if icd not in REFERENCE_ICD_CODES:
             warnings.append(ValidationWarning(
-                code="UNKNOWN_DIAGNOSIS_CODE",
-                message=f"ICD-10 code '{icd}' is not present in the demo reference set."
+                code="NON_REFERENCE_DIAGNOSIS_CODE",
+                message=f"Validation Warning: Non-reference code detected. ICD-10 diagnosis code '{icd}' is not present in the demo reference set. Allowed with warning."
             ))
 
     # 8. Soft Warnings: Eligibility verification missing or stale

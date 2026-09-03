@@ -128,17 +128,29 @@ export default function PredictionCard({ prediction, onOpenWhatIf }) {
         </div>
       </div>
 
-      {/* Validation Warnings (if any) */}
+      {/* Validation Warnings (Non-Reference Codes & Soft Warnings) */}
       {prediction.validation_warnings && prediction.validation_warnings.length > 0 && (
-        <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl space-y-1">
-          <div className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
-            <AlertTriangle className="w-3.5 h-3.5" />
-            Pre-Submission Warnings ({prediction.validation_warnings.length})
+        <div
+          role="alert"
+          data-testid="validation-warnings"
+          className="mt-4 p-4 bg-amber-500/15 border-2 border-amber-500/40 rounded-xl space-y-2 shadow-md"
+        >
+          <div className="flex items-center justify-between">
+            <div className="text-sm font-bold text-amber-300 flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0" />
+              <span>Validation Warnings — Non-Reference Codes & Pre-Submission Alerts ({prediction.validation_warnings.length})</span>
+            </div>
+            <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+              Non-blocking: Analysis Allowed
+            </span>
           </div>
-          <ul className="text-xs text-amber-200/90 list-disc list-inside space-y-0.5">
+          <p className="text-xs text-amber-200/80">
+            Unknown demo codes and non-reference parameters generate validation warnings while still allowing pre-submission risk scoring:
+          </p>
+          <ul className="text-xs text-amber-200/90 list-disc list-inside space-y-1 pt-1">
             {prediction.validation_warnings.map((w, idx) => (
-              <li key={idx}>
-                <span className="font-mono font-semibold">{w.code}:</span> {w.message}
+              <li key={idx} className="leading-relaxed">
+                <span className="font-mono font-bold text-amber-300">{w.code}:</span> {w.message}
               </li>
             ))}
           </ul>

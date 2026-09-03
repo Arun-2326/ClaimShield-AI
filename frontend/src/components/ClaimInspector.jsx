@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Play, Sparkles, AlertCircle, CheckCircle2, RotateCcw, Stethoscope, Clock, ShieldAlert } from 'lucide-react';
-import { DEMO_PRESETS } from '../utils/constants';
+import { Play, Sparkles, AlertCircle, CheckCircle2, RotateCcw, Stethoscope, Clock, ShieldAlert, AlertTriangle } from 'lucide-react';
+import { DEMO_PRESETS, REFERENCE_CPT_CODES, REFERENCE_ICD_CODES } from '../utils/constants';
 
 const PAYER_OPTIONS = [
   { id: "PAYER_001", name: "Blue Cross Blue Shield Demo (Strict Prior Auth)" },
@@ -16,8 +16,8 @@ const SPECIALTY_OPTIONS = [
   "Orthopedic Surgery", "Gastroenterology", "Physical Therapy", "Radiology"
 ];
 
-export default function ClaimInspector({ onAnalyze, loading, currentClaim, setCurrentClaim }) {
-  const [activePresetId, setActivePresetId] = useState("preset_pa");
+export default function ClaimInspector({ onAnalyze, onReset, loading, currentClaim, setCurrentClaim }) {
+  const [activePresetId, setActivePresetId] = useState(null);
 
   const handleSelectPreset = (preset) => {
     setActivePresetId(preset.id);
@@ -233,30 +233,72 @@ export default function ClaimInspector({ onAnalyze, loading, currentClaim, setCu
           </label>
         </div>
 
+        {/* Live Non-Reference Code Warning Banner */}
+        {(() => {
+          const nonRefCpts = (currentClaim.cpt_codes || []).filter(c => !REFERENCE_CPT_CODES.includes(c));
+          const nonRefIcds = (currentClaim.icd_codes || []).filter(c => !REFERENCE_ICD_CODES.includes(c));
+          const allNonRef = [...nonRefCpts, ...nonRefIcds];
+          if (allNonRef.length === 0) return null;
+          return (
+            <div
+              role="alert"
+              data-testid="validation-warnings"
+              className="p-3 bg-amber-500/15 border border-amber-500/40 rounded-xl space-y-1 animate-fadeIn"
+            >
+              <div className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                <span>Validation Warnings: Non-Reference Codes Detected ({allNonRef.length})</span>
+              </div>
+              <p className="text-xs text-amber-200/90 leading-relaxed">
+                Non-reference code(s) detected: {allNonRef.map(c => `"${c}"`).join(', ')}. Unknown demo codes generate validation warnings while still allowing claim analysis to proceed.
+              </p>
+            </div>
+          );
+        })()}
+
         {/* Submit Action Bar */}
-        <div className="flex items-center justify-between pt-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
           <div className="text-xs text-slate-400 flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-ping" />
             Deterministic validation + Dual-stage ML prediction pipeline
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-sm shadow-lg shadow-sky-500/25 disabled:opacity-50 transition-all cursor-pointer"
-          >
-            {loading ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Analyzing Pre-Submission...
-              </>
-            ) : (
-              <>
-                <Play className="w-4 h-4 fill-white" />
-                Analyze Before Submission
-              </>
+          <div className="flex items-center gap-2 self-end sm:self-auto">
+            {onReset && (
+              <button
+                type="button"
+                data-testid="reset-claim-btn"
+                onClick={() => {
+                  setActivePresetId(null);
+                  onReset();
+                }}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900/80 hover:bg-slate-700/80 text-slate-300 hover:text-white border border-slate-700 text-xs font-semibold transition-all cursor-pointer"
+                title="Reset form to empty dashboard state"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                New / Empty State
+              </button>
             )}
-          </button>
+
+            <button
+              type="submit"
+              data-testid="analyze-claim-btn"
+              disabled={loading}
+              className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-sm shadow-lg shadow-sky-500/25 disabled:opacity-50 transition-all cursor-pointer"
+            >
+              {loading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Analyzing Pre-Submission...
+                </>
+              ) : (
+                <>
+                  <Play className="w-4 h-4 fill-white" />
+                  Analyze Before Submission
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </form>
     </div>
