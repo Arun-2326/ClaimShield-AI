@@ -11,12 +11,12 @@ $BackendDir = Join-Path $Root "backend"
 $FrontendDir = Join-Path $Root "frontend"
 
 Write-Host "1. Starting FastAPI Backend on http://127.0.0.1:8000..." -ForegroundColor Cyan
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$BackendDir'; python -m uvicorn app.main:app --reload --port 8000"
+Start-Process powershell -ArgumentList "-ExecutionPolicy", "Bypass", "-NoExit", "-Command", "cd '$BackendDir'; python -m uvicorn app.main:app --reload --port 8000"
 
 Start-Sleep -Seconds 3
 
 Write-Host "2. Starting React Vite Frontend on http://localhost:5173..." -ForegroundColor Cyan
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$FrontendDir'; cmd /c npm run dev"
+Start-Process powershell -ArgumentList "-ExecutionPolicy", "Bypass", "-NoExit", "-Command", "cd '$FrontendDir'; cmd /c npm run dev"
 
 Start-Sleep -Seconds 2
 
