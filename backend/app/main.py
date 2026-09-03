@@ -176,3 +176,12 @@ app.include_router(claims.router)
 app.include_router(payers.router)
 app.include_router(outcomes.router)
 app.include_router(metrics.router)
+
+# Mount built React frontend for unified single-port deployment
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
+
+FRONTEND_DIST = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"
+if FRONTEND_DIST.exists():
+    app.mount("/", StaticFiles(directory=str(FRONTEND_DIST), html=True), name="frontend")
+
