@@ -45,3 +45,4 @@ backend/data/*.db
 Thumbs.db
 .vscode/
 .idea/
+cloudflared.exe
