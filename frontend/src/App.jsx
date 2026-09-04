@@ -162,13 +162,13 @@ export default function App() {
             <div className="xl:col-span-4 xl:sticky xl:top-20 space-y-4">
               {/* Room Header */}
               <div className="flex items-center justify-between px-1">
-                <div className="flex items-center gap-2">
-                  <span className={`w-2 h-2 rounded-full ${loading ? 'bg-amber-400 animate-ping' : currentPrediction ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'}`} />
-                  <h3 className="text-xs font-bold uppercase tracking-widest text-slate-300">
+                <div className="flex items-center gap-2.5">
+                  <span className={`w-2.5 h-2.5 rounded-full ${loading ? 'bg-amber-400 animate-ping' : currentPrediction ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'}`} />
+                  <h3 className="text-sm font-black uppercase tracking-wider text-slate-200">
                     Real-Time AI Judgment Room
                   </h3>
                 </div>
-                <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-400 uppercase">
+                <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 uppercase">
                   {loading ? 'Pipeline Active' : currentPrediction ? 'Adjudicated' : 'Standby'}
                 </span>
               </div>
@@ -183,87 +183,87 @@ export default function App() {
                   <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
 
                   <div>
-                    <div className="text-[10px] font-bold uppercase tracking-widest text-sky-400 font-mono flex items-center gap-1.5">
-                      <Cpu className="w-3.5 h-3.5 text-sky-400 animate-spin" />
+                    <div className="text-xs font-extrabold uppercase tracking-widest text-sky-400 font-mono flex items-center gap-2">
+                      <Cpu className="w-4 h-4 text-sky-400 animate-spin" />
                       Pre-Submission Execution Pipeline
                     </div>
-                    <h4 className="text-base font-extrabold text-white tracking-tight mt-1">
+                    <h4 className="text-lg font-black text-white tracking-tight mt-1.5">
                       Multi-Stage RCM Evaluation
                     </h4>
-                    <p className="text-xs text-slate-400 mt-1">
+                    <p className="text-sm text-slate-300 mt-1 leading-relaxed">
                       Running deterministic validation, feature extraction & dual-stage random forest models...
                     </p>
                   </div>
 
                   {/* 3-Step Sequential Stream */}
-                  <div className="space-y-3 pt-1">
+                  <div className="space-y-3.5 pt-1">
                     {/* Step 1 */}
-                    <div className={`flex items-start gap-3 p-3 rounded-xl border transition-all duration-300 ${
+                    <div className={`flex items-start gap-3.5 p-3.5 rounded-xl border transition-all duration-300 ${
                       pipelineStep >= 1 ? 'bg-slate-950/90 border-emerald-500/40' : 'bg-slate-950/40 border-slate-800/80 opacity-50'
                     }`}>
-                      <div className="w-6 h-6 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 flex-shrink-0 mt-0.5">
+                      <div className="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 flex-shrink-0 mt-0.5">
                         {pipelineStep >= 1 ? (
-                          <Check className="w-3.5 h-3.5 animate-checkPop text-emerald-400" />
+                          <Check className="w-4 h-4 animate-checkPop text-emerald-400" />
                         ) : (
-                          <div className="w-2 h-2 rounded-full bg-slate-600" />
+                          <div className="w-2.5 h-2.5 rounded-full bg-slate-600" />
                         )}
                       </div>
                       <div>
-                        <div className="text-xs font-bold text-white flex items-center gap-1.5">
+                        <div className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
                           <span>1. EDI 837 Schema & Duplicate Check</span>
                           {pipelineStep >= 1 && (
-                            <span className="text-[10px] font-mono text-emerald-400 font-bold">Passed</span>
+                            <span className="text-xs font-mono text-emerald-400 font-bold">Passed</span>
                           )}
                         </div>
-                        <p className="text-[11px] text-slate-400 mt-0.5">
+                        <p className="text-xs sm:text-sm text-slate-300 mt-0.5 leading-relaxed">
                           Verified payer syntax, charge consistency & zero duplicate collision.
                         </p>
                       </div>
                     </div>
 
                     {/* Step 2 */}
-                    <div className={`flex items-start gap-3 p-3 rounded-xl border transition-all duration-300 ${
+                    <div className={`flex items-start gap-3.5 p-3.5 rounded-xl border transition-all duration-300 ${
                       pipelineStep >= 2 ? 'bg-slate-950/90 border-sky-500/40' : 'bg-slate-950/40 border-slate-800/80 opacity-50'
                     }`}>
-                      <div className="w-6 h-6 rounded-lg bg-sky-500/20 border border-sky-500/40 flex items-center justify-center text-sky-400 flex-shrink-0 mt-0.5">
+                      <div className="w-7 h-7 rounded-lg bg-sky-500/20 border border-sky-500/40 flex items-center justify-center text-sky-400 flex-shrink-0 mt-0.5">
                         {pipelineStep >= 2 ? (
-                          <Check className="w-3.5 h-3.5 animate-checkPop text-sky-400" />
+                          <Check className="w-4 h-4 animate-checkPop text-sky-400" />
                         ) : (
-                          <div className="w-2 h-2 rounded-full bg-slate-600" />
+                          <div className="w-2.5 h-2.5 rounded-full bg-slate-600" />
                         )}
                       </div>
                       <div>
-                        <div className="text-xs font-bold text-white flex items-center gap-1.5">
+                        <div className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
                           <span>2. Feature Extraction & Zero-Leakage</span>
                           {pipelineStep >= 2 && (
-                            <span className="text-[10px] font-mono text-sky-400 font-bold">Passed</span>
+                            <span className="text-xs font-mono text-sky-400 font-bold">Passed</span>
                           )}
                         </div>
-                        <p className="text-[11px] text-slate-400 mt-0.5">
+                        <p className="text-xs sm:text-sm text-slate-300 mt-0.5 leading-relaxed">
                           Extracted 18 pre-bill features; zero target post-submission contamination.
                         </p>
                       </div>
                     </div>
 
                     {/* Step 3 */}
-                    <div className={`flex items-start gap-3 p-3 rounded-xl border transition-all duration-300 ${
+                    <div className={`flex items-start gap-3.5 p-3.5 rounded-xl border transition-all duration-300 ${
                       pipelineStep >= 3 ? 'bg-slate-950/90 border-indigo-500/40' : 'bg-slate-950/40 border-slate-800/80 opacity-50'
                     }`}>
-                      <div className="w-6 h-6 rounded-lg bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 flex-shrink-0 mt-0.5">
+                      <div className="w-7 h-7 rounded-lg bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 flex-shrink-0 mt-0.5">
                         {pipelineStep >= 3 ? (
-                          <Check className="w-3.5 h-3.5 animate-checkPop text-indigo-400" />
+                          <Check className="w-4 h-4 animate-checkPop text-indigo-400" />
                         ) : (
-                          <div className="w-3 h-3 border-2 border-indigo-400/40 border-t-indigo-400 rounded-full animate-spin" />
+                          <div className="w-3.5 h-3.5 border-2 border-indigo-400/40 border-t-indigo-400 rounded-full animate-spin" />
                         )}
                       </div>
                       <div>
-                        <div className="text-xs font-bold text-white flex items-center gap-1.5">
+                        <div className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
                           <span>3. Dual-Stage Random Forest Scoring</span>
                           {pipelineStep >= 3 && (
-                            <span className="text-[10px] font-mono text-indigo-300 font-bold">Scored</span>
+                            <span className="text-xs font-mono text-indigo-300 font-bold">Scored</span>
                           )}
                         </div>
-                        <p className="text-[11px] text-slate-400 mt-0.5">
+                        <p className="text-xs sm:text-sm text-slate-300 mt-0.5 leading-relaxed">
                           Calibrated denial risk scoring & CARC code root cause mapping.
                         </p>
                       </div>
@@ -283,18 +283,18 @@ export default function App() {
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-sky-500/5 rounded-full blur-3xl pointer-events-none" />
 
                   <div className="space-y-4 relative">
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-sky-500/10 to-indigo-500/10 border border-sky-500/30 flex items-center justify-center mx-auto text-sky-400 shadow-lg shadow-sky-500/10">
-                      <FileSearch className="w-7 h-7" />
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-sky-500/10 to-indigo-500/10 border border-sky-500/30 flex items-center justify-center mx-auto text-sky-400 shadow-lg shadow-sky-500/10">
+                      <FileSearch className="w-8 h-8" />
                     </div>
 
                     <div>
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-sky-400 bg-sky-500/10 px-2.5 py-1 rounded-full border border-sky-500/20">
+                      <span className="text-xs font-extrabold uppercase tracking-widest text-sky-400 bg-sky-500/10 px-3 py-1 rounded-full border border-sky-500/20">
                         Empty Dashboard State
                       </span>
-                      <h3 className="text-lg font-extrabold text-white tracking-tight mt-2">
+                      <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight mt-2.5">
                         Awaiting Claim Intake
                       </h3>
-                      <p className="text-xs text-slate-400 mt-1.5 leading-relaxed">
+                      <p className="text-sm text-slate-300 mt-2 leading-relaxed">
                         Select a scenario preset on the left or customize encounter parameters, then trigger pre-submission analysis.
                       </p>
                     </div>
@@ -312,25 +312,25 @@ export default function App() {
                           }
                           handleAnalyze(claimToAnalyze);
                         }}
-                        className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-sky-500 via-indigo-600 to-indigo-700 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-xs shadow-xl shadow-indigo-600/30 transition-all duration-300 hover:scale-[1.02] cursor-pointer"
+                        className="w-full flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-gradient-to-r from-sky-500 via-indigo-600 to-indigo-700 hover:from-sky-400 hover:to-indigo-500 text-white font-black text-sm sm:text-base shadow-xl shadow-indigo-600/30 transition-all duration-300 hover:scale-[1.02] cursor-pointer"
                       >
                         <Play className="w-4 h-4 fill-white" />
                         <span>Start New Claim Analysis</span>
                       </button>
                     </div>
 
-                    <div className="pt-4 border-t border-slate-800/80 text-[11px] text-slate-500 text-left space-y-1.5">
-                      <div className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                        <span className="text-slate-400">Deterministic check for hard-stop billing errors</span>
+                    <div className="pt-4 border-t border-slate-800/80 text-xs sm:text-sm text-slate-300 text-left space-y-2">
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0" />
+                        <span className="text-slate-300 font-medium">Deterministic check for hard-stop billing errors</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
-                        <span className="text-slate-400">Calibrated ML denial probability scoring</span>
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-2 h-2 rounded-full bg-sky-400 flex-shrink-0" />
+                        <span className="text-slate-300 font-medium">Calibrated ML denial probability scoring</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                        <span className="text-slate-400">Actionable CARC attribution & work queue routing</span>
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0" />
+                        <span className="text-slate-300 font-medium">Actionable CARC attribution & work queue routing</span>
                       </div>
                     </div>
                   </div>
@@ -384,15 +384,15 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-800/80 bg-slate-900/60 py-4 mt-8">
-        <div className="max-w-7xl mx-auto px-4 text-center text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <footer className="border-t border-slate-800/80 bg-slate-900/60 py-5 mt-8">
+        <div className="max-w-7xl mx-auto px-4 text-center text-sm text-slate-300 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div>
-            <span className="font-bold text-slate-300">ClaimShield AI</span> — Pre-Submission RCM Denial Prevention Engine
+            <span className="font-black text-white">ClaimShield AI</span> — Pre-Submission RCM Denial Prevention Engine
           </div>
-          <div className="font-mono text-[11px] text-amber-400">
+          <div className="font-mono text-xs sm:text-sm font-bold text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
             SIMULATED / DEMO DATA ONLY — Not clinically validated or payer certified
           </div>
-          <div>
+          <div className="font-medium text-slate-400">
             Microsoft Innovation Club (VIT Chennai)
           </div>
         </div>

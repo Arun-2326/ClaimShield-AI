@@ -35,54 +35,54 @@ export default function BatchUploadModal({ onClose, onSuccess }) {
           <X className="w-5 h-5" />
         </button>
 
-        <div className="flex items-center gap-3 pb-4 border-b border-slate-800">
-          <div className="p-2.5 rounded-xl bg-sky-500/20 text-sky-400 border border-sky-500/30">
-            <FileSpreadsheet className="w-6 h-6" />
+        <div className="flex items-center gap-3.5 pb-4 border-b border-slate-800">
+          <div className="p-3 rounded-xl bg-sky-500/20 text-sky-400 border border-sky-500/30">
+            <FileSpreadsheet className="w-7 h-7" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-white">Batch Synthetic Claims Intake</h2>
-            <p className="text-xs text-slate-400">Upload CSV for pre-submission intelligence scoring</p>
+            <h2 className="text-xl font-black text-white">Batch Synthetic Claims Intake</h2>
+            <p className="text-sm text-slate-300 mt-0.5 font-medium">Upload CSV for pre-submission intelligence scoring</p>
           </div>
         </div>
 
         {error && (
-          <div className="my-3 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-xs text-rose-300 flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+          <div className="my-3.5 p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-sm text-rose-300 flex items-center gap-2.5">
+            <AlertCircle className="w-5 h-5 flex-shrink-0" />
             {error}
           </div>
         )}
 
         {result ? (
-          <div className="my-5 p-5 bg-emerald-950/20 border border-emerald-500/30 rounded-xl space-y-3">
-            <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm">
+          <div className="my-5 p-5 bg-emerald-950/20 border border-emerald-500/30 rounded-xl space-y-3.5">
+            <div className="flex items-center gap-2.5 text-emerald-400 font-black text-base">
               <CheckCircle2 className="w-5 h-5" />
               Batch Ingestion & Scoring Successful
             </div>
-            <div className="grid grid-cols-3 gap-2 text-center text-xs pt-2">
-              <div className="p-2 bg-slate-900 rounded-lg border border-slate-800">
-                <div className="text-slate-400">Processed</div>
-                <div className="text-lg font-bold text-white">{result.processed_count}</div>
+            <div className="grid grid-cols-3 gap-3 text-center text-sm pt-2">
+              <div className="p-3 bg-slate-900 rounded-xl border border-slate-800">
+                <div className="text-xs uppercase font-bold text-slate-400">Processed</div>
+                <div className="text-xl font-black text-white font-mono mt-1">{result.processed_count}</div>
               </div>
-              <div className="p-2 bg-slate-900 rounded-lg border border-slate-800">
-                <div className="text-emerald-400">Released</div>
-                <div className="text-lg font-bold text-emerald-400">{result.released_count}</div>
+              <div className="p-3 bg-slate-900 rounded-xl border border-slate-800">
+                <div className="text-xs uppercase font-bold text-emerald-400">Released</div>
+                <div className="text-xl font-black text-emerald-400 font-mono mt-1">{result.released_count}</div>
               </div>
-              <div className="p-2 bg-slate-900 rounded-lg border border-slate-800">
-                <div className="text-rose-400">Held for Fix</div>
-                <div className="text-lg font-bold text-rose-400">{result.held_for_correction}</div>
+              <div className="p-3 bg-slate-900 rounded-xl border border-slate-800">
+                <div className="text-xs uppercase font-bold text-rose-400">Held for Fix</div>
+                <div className="text-xl font-black text-rose-400 font-mono mt-1">{result.held_for_correction}</div>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="w-full mt-3 py-2 bg-emerald-500 text-slate-950 font-bold text-xs rounded-lg hover:bg-emerald-400 transition"
+              className="w-full mt-3 py-2.5 bg-emerald-500 text-slate-950 font-black text-sm rounded-xl hover:bg-emerald-400 transition cursor-pointer"
             >
               Done & View Queue
             </button>
           </div>
         ) : (
-          <form onSubmit={handleUpload} className="mt-4 space-y-4">
-            <div className="border-2 border-dashed border-slate-700 hover:border-sky-500/60 rounded-xl p-6 text-center cursor-pointer transition">
-              <Upload className="w-8 h-8 text-sky-400 mx-auto mb-2" />
+          <form onSubmit={handleUpload} className="mt-5 space-y-4">
+            <div className="border-2 border-dashed border-slate-700 hover:border-sky-500/60 rounded-xl p-8 text-center cursor-pointer transition">
+              <Upload className="w-10 h-10 text-sky-400 mx-auto mb-3" />
               <input
                 type="file"
                 accept=".csv"
@@ -91,27 +91,27 @@ export default function BatchUploadModal({ onClose, onSuccess }) {
                 id="csvUploadInput"
               />
               <label htmlFor="csvUploadInput" className="cursor-pointer">
-                <span className="text-xs text-slate-300 font-semibold block">
+                <span className="text-sm text-slate-200 font-bold block">
                   {file ? file.name : "Click to select synthetic CSV file"}
                 </span>
-                <span className="text-[11px] text-slate-400 mt-1 block">
-                  Accepts standard synthetic claim columns
+                <span className="text-xs text-slate-400 mt-1.5 block font-medium">
+                  Accepts standard synthetic claim columns (EDI 837 mapped)
                 </span>
               </label>
             </div>
 
-            <div className="flex justify-end gap-2 pt-2">
+            <div className="flex justify-end gap-3 pt-2">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-white bg-slate-800 transition"
+                className="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-300 hover:text-white bg-slate-800 transition cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={!file || loading}
-                className="px-5 py-2 rounded-lg text-xs font-bold text-white bg-sky-500 hover:bg-sky-400 disabled:opacity-50 transition"
+                className="px-6 py-2.5 rounded-xl text-sm font-black text-white bg-sky-500 hover:bg-sky-400 disabled:opacity-50 transition cursor-pointer"
               >
                 {loading ? "Processing..." : "Score & Ingest Claims"}
               </button>
