@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { FileSearch, Play, Sparkles, ShieldCheck, Check, Activity, ShieldAlert, Cpu } from 'lucide-react';
+import { FileSearch, Play, Sparkles, ShieldCheck } from 'lucide-react';
 import Navbar from './components/Navbar';
-import KpiRibbon, { PreventableLeakageRadar } from './components/KpiRibbon';
+import KpiRibbon from './components/KpiRibbon';
 import ClaimInspector from './components/ClaimInspector';
 import PredictionCard from './components/PredictionCard';
 import RiskFactorsList from './components/RiskFactorsList';
@@ -22,7 +22,6 @@ export default function App() {
   const [health, setHealth] = useState(null);
 
   const [loading, setLoading] = useState(false);
-  const [pipelineStep, setPipelineStep] = useState(0);
   const [queueLoading, setQueueLoading] = useState(false);
 
   // Modals
@@ -69,26 +68,16 @@ export default function App() {
 
   const handleAnalyze = async (claimToAnalyze) => {
     setLoading(true);
-    setPipelineStep(1); // Step 1: EDI schema & duplicate check
     try {
-      const t1 = setTimeout(() => setPipelineStep(2), 350); // Step 2: Feature extraction
-      const t2 = setTimeout(() => setPipelineStep(3), 750); // Step 3: Dual-stage ML scoring
-
-      const [pred] = await Promise.all([
-        api.predictClaim(claimToAnalyze),
-        new Promise(res => setTimeout(res, 1100)) // ensure judges see the 3-step stream
-      ]);
-
-      clearTimeout(t1);
-      clearTimeout(t2);
+      const pred = await api.predictClaim(claimToAnalyze);
       setCurrentPrediction(pred);
+      // Reload queue & metrics to reflect newly scored claim
       loadMetrics();
       loadClaims();
     } catch (err) {
       console.error("Prediction failed:", err);
     } finally {
       setLoading(false);
-      setPipelineStep(0);
     }
   };
 
@@ -135,228 +124,118 @@ export default function App() {
         onOpenUpload={() => setIsUploadOpen(true)}
       />
 
-      {/* Main Container - Expansive Canvas */}
-      <main className="flex-1 max-w-[1700px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        {/* Condensed Executive Header Toolbar Strip */}
+      {/* Main Container */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        {/* KPI Ribbon */}
         <KpiRibbon metrics={metrics} loading={!metrics} />
 
-        {/* Tab 1: Live Claim Inspector (70/30 Asymmetrical Split Layout) */}
+        {/* Tab 1: Live Claim Inspector */}
         {activeTab === 'inspector' && (
-          <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start animate-fadeIn">
-            {/* Left 70% Column: The Action Hub */}
-            <div className="xl:col-span-8 space-y-6">
-              {/* Pre-Submission Claim Intake Studio */}
-              <ClaimInspector
-                onAnalyze={handleAnalyze}
-                onReset={handleReset}
-                loading={loading}
-                currentClaim={currentClaim}
-                setCurrentClaim={setCurrentClaim}
-              />
+          <div className="space-y-5 animate-fadeIn">
+            {/* Top: Intake Form & Preset Picker */}
+            <ClaimInspector
+              onAnalyze={handleAnalyze}
+              onReset={handleReset}
+              loading={loading}
+              currentClaim={currentClaim}
+              setCurrentClaim={setCurrentClaim}
+            />
 
-              {/* Preventable Leakage Radar (Executive Financial Impact Scorecard) */}
-              <PreventableLeakageRadar metrics={metrics} />
-            </div>
-
-            {/* Right 30% Column: The Live Feedback Hub (Real-Time AI Judgment Room) */}
-            <div className="xl:col-span-4 xl:sticky xl:top-20 space-y-4">
-              {/* Room Header */}
-              <div className="flex items-center justify-between px-1">
-                <div className="flex items-center gap-2.5">
-                  <span className={`w-2.5 h-2.5 rounded-full ${loading ? 'bg-amber-400 animate-ping' : currentPrediction ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'}`} />
-                  <h3 className="text-sm font-black uppercase tracking-wider text-slate-200">
-                    Real-Time AI Judgment Room
-                  </h3>
-                </div>
-                <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 uppercase">
-                  {loading ? 'Pipeline Active' : currentPrediction ? 'Adjudicated' : 'Standby'}
-                </span>
+            {/* Loading State during analysis */}
+            {loading && (
+              <div
+                role="status"
+                data-testid="analysis-loading-state"
+                className="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-12 text-center shadow-lg animate-pulse"
+              >
+                <div className="w-10 h-10 border-3 border-sky-500/30 border-t-sky-400 rounded-full animate-spin mx-auto mb-3" />
+                <h3 className="text-base font-bold text-white">Analyzing Pre-Submission Claim...</h3>
+                <p className="text-xs text-slate-400 mt-1">
+                  Evaluating deterministic rules, calculating dual-stage denial risk, and mapping CARC root causes
+                </p>
               </div>
+            )}
 
-              {/* State 1: "Passed Validation" Animated Pipeline Stream */}
-              {loading && (
-                <div
-                  role="status"
-                  data-testid="analysis-loading-state"
-                  className="bg-slate-900/90 backdrop-blur-xl border border-indigo-500/40 rounded-2xl p-6 shadow-2xl shadow-indigo-950/40 space-y-5 animate-fadeInUp relative overflow-hidden"
-                >
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
-
+            {/* Empty Dashboard State (Shown before any claim is analyzed) */}
+            {!currentPrediction && !loading && (
+              <div
+                role="region"
+                aria-label="Empty Dashboard State"
+                data-testid="empty-dashboard-state"
+                className="bg-slate-800/40 border-2 border-slate-700/50 border-dashed rounded-2xl p-10 text-center shadow-lg animate-fadeIn"
+              >
+                <div className="max-w-lg mx-auto space-y-4">
+                  <div className="w-16 h-16 rounded-2xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center mx-auto text-sky-400 shadow-inner">
+                    <FileSearch className="w-8 h-8" />
+                  </div>
                   <div>
-                    <div className="text-xs font-extrabold uppercase tracking-widest text-sky-400 font-mono flex items-center gap-2">
-                      <Cpu className="w-4 h-4 text-sky-400 animate-spin" />
-                      Pre-Submission Execution Pipeline
-                    </div>
-                    <h4 className="text-lg font-black text-white tracking-tight mt-1.5">
-                      Multi-Stage RCM Evaluation
-                    </h4>
-                    <p className="text-sm text-slate-300 mt-1 leading-relaxed">
-                      Running deterministic validation, feature extraction & dual-stage random forest models...
+                    <h3 className="text-lg font-bold text-white">
+                      Empty Dashboard State — Ready for Claim Analysis
+                    </h3>
+                    <p className="text-xs text-slate-300 mt-1.5 leading-relaxed">
+                      The dashboard presents a clean, empty state ready for submission analysis.
+                      Select one of the 1-click presets above or enter custom claim parameters, then click{' '}
+                      <strong className="text-sky-300">Start New Claim Analysis</strong>.
                     </p>
                   </div>
 
-                  {/* 3-Step Sequential Stream */}
-                  <div className="space-y-3.5 pt-1">
-                    {/* Step 1 */}
-                    <div className={`flex items-start gap-3.5 p-3.5 rounded-xl border transition-all duration-300 ${
-                      pipelineStep >= 1 ? 'bg-slate-950/90 border-emerald-500/40' : 'bg-slate-950/40 border-slate-800/80 opacity-50'
-                    }`}>
-                      <div className="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 flex-shrink-0 mt-0.5">
-                        {pipelineStep >= 1 ? (
-                          <Check className="w-4 h-4 animate-checkPop text-emerald-400" />
-                        ) : (
-                          <div className="w-2.5 h-2.5 rounded-full bg-slate-600" />
-                        )}
-                      </div>
-                      <div>
-                        <div className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
-                          <span>1. EDI 837 Schema & Duplicate Check</span>
-                          {pipelineStep >= 1 && (
-                            <span className="text-xs font-mono text-emerald-400 font-bold">Passed</span>
-                          )}
-                        </div>
-                        <p className="text-xs sm:text-sm text-slate-300 mt-0.5 leading-relaxed">
-                          Verified payer syntax, charge consistency & zero duplicate collision.
-                        </p>
-                      </div>
-                    </div>
+                  <div className="pt-2">
+                    <button
+                      type="button"
+                      data-testid="start-analysis-btn"
+                      onClick={() => {
+                        const claimToAnalyze = (currentClaim.claim_id && currentClaim.cpt_codes && currentClaim.cpt_codes.length > 0)
+                          ? currentClaim
+                          : { ...DEMO_PRESETS[0].data };
+                        if (!currentClaim.claim_id) {
+                          setCurrentClaim(claimToAnalyze);
+                        }
+                        handleAnalyze(claimToAnalyze);
+                      }}
+                      className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-sky-500/30 transition-all cursor-pointer"
+                    >
+                      <Play className="w-3.5 h-3.5 fill-white" />
+                      Start New Claim Analysis
+                    </button>
+                  </div>
 
-                    {/* Step 2 */}
-                    <div className={`flex items-start gap-3.5 p-3.5 rounded-xl border transition-all duration-300 ${
-                      pipelineStep >= 2 ? 'bg-slate-950/90 border-sky-500/40' : 'bg-slate-950/40 border-slate-800/80 opacity-50'
-                    }`}>
-                      <div className="w-7 h-7 rounded-lg bg-sky-500/20 border border-sky-500/40 flex items-center justify-center text-sky-400 flex-shrink-0 mt-0.5">
-                        {pipelineStep >= 2 ? (
-                          <Check className="w-4 h-4 animate-checkPop text-sky-400" />
-                        ) : (
-                          <div className="w-2.5 h-2.5 rounded-full bg-slate-600" />
-                        )}
-                      </div>
-                      <div>
-                        <div className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
-                          <span>2. Feature Extraction & Zero-Leakage</span>
-                          {pipelineStep >= 2 && (
-                            <span className="text-xs font-mono text-sky-400 font-bold">Passed</span>
-                          )}
-                        </div>
-                        <p className="text-xs sm:text-sm text-slate-300 mt-0.5 leading-relaxed">
-                          Extracted 18 pre-bill features; zero target post-submission contamination.
-                        </p>
-                      </div>
+                  <div className="grid grid-cols-3 gap-3 pt-4 border-t border-slate-800 text-[11px] text-slate-400">
+                    <div className="p-2 rounded-lg bg-slate-900/50 border border-slate-800/80">
+                      <span className="block font-semibold text-sky-300">Deterministic</span>
+                      <span>Hard check guardrails</span>
                     </div>
-
-                    {/* Step 3 */}
-                    <div className={`flex items-start gap-3.5 p-3.5 rounded-xl border transition-all duration-300 ${
-                      pipelineStep >= 3 ? 'bg-slate-950/90 border-indigo-500/40' : 'bg-slate-950/40 border-slate-800/80 opacity-50'
-                    }`}>
-                      <div className="w-7 h-7 rounded-lg bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 flex-shrink-0 mt-0.5">
-                        {pipelineStep >= 3 ? (
-                          <Check className="w-4 h-4 animate-checkPop text-indigo-400" />
-                        ) : (
-                          <div className="w-3.5 h-3.5 border-2 border-indigo-400/40 border-t-indigo-400 rounded-full animate-spin" />
-                        )}
-                      </div>
-                      <div>
-                        <div className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
-                          <span>3. Dual-Stage Random Forest Scoring</span>
-                          {pipelineStep >= 3 && (
-                            <span className="text-xs font-mono text-indigo-300 font-bold">Scored</span>
-                          )}
-                        </div>
-                        <p className="text-xs sm:text-sm text-slate-300 mt-0.5 leading-relaxed">
-                          Calibrated denial risk scoring & CARC code root cause mapping.
-                        </p>
-                      </div>
+                    <div className="p-2 rounded-lg bg-slate-900/50 border border-slate-800/80">
+                      <span className="block font-semibold text-indigo-300">Dual-Stage ML</span>
+                      <span>Calibrated risk score</span>
+                    </div>
+                    <div className="p-2 rounded-lg bg-slate-900/50 border border-slate-800/80">
+                      <span className="block font-semibold text-amber-300">CARC Attribution</span>
+                      <span>Root cause explanation</span>
                     </div>
                   </div>
                 </div>
-              )}
+              </div>
+            )}
 
-              {/* State 2: Empty Dashboard State */}
-              {!currentPrediction && !loading && (
-                <div
-                  role="region"
-                  aria-label="Empty Dashboard State"
-                  data-testid="empty-dashboard-state"
-                  className="bg-slate-900/60 backdrop-blur-xl border-2 border-slate-800/80 border-dashed rounded-2xl p-7 text-center shadow-2xl relative overflow-hidden animate-fadeInUp"
-                >
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-sky-500/5 rounded-full blur-3xl pointer-events-none" />
+            {/* Bottom: Prediction, Explanations, and Recommendation */}
+            {currentPrediction && !loading && (
+              <div className="space-y-5">
+                {/* Disposition & Risk Gauge Card */}
+                <PredictionCard
+                  prediction={currentPrediction}
+                  onOpenWhatIf={() => setIsWhatIfOpen(true)}
+                />
 
-                  <div className="space-y-4 relative">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-sky-500/10 to-indigo-500/10 border border-sky-500/30 flex items-center justify-center mx-auto text-sky-400 shadow-lg shadow-sky-500/10">
-                      <FileSearch className="w-8 h-8" />
-                    </div>
-
-                    <div>
-                      <span className="text-xs font-extrabold uppercase tracking-widest text-sky-400 bg-sky-500/10 px-3 py-1 rounded-full border border-sky-500/20">
-                        Empty Dashboard State
-                      </span>
-                      <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight mt-2.5">
-                        Awaiting Claim Intake
-                      </h3>
-                      <p className="text-sm text-slate-300 mt-2 leading-relaxed">
-                        Select a scenario preset on the left or customize encounter parameters, then trigger pre-submission analysis.
-                      </p>
-                    </div>
-
-                    <div className="pt-2">
-                      <button
-                        type="button"
-                        data-testid="start-analysis-btn"
-                        onClick={() => {
-                          const claimToAnalyze = (currentClaim.claim_id && currentClaim.cpt_codes && currentClaim.cpt_codes.length > 0)
-                            ? currentClaim
-                            : { ...DEMO_PRESETS[0].data };
-                          if (!currentClaim.claim_id) {
-                            setCurrentClaim(claimToAnalyze);
-                          }
-                          handleAnalyze(claimToAnalyze);
-                        }}
-                        className="w-full flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-gradient-to-r from-sky-500 via-indigo-600 to-indigo-700 hover:from-sky-400 hover:to-indigo-500 text-white font-black text-sm sm:text-base shadow-xl shadow-indigo-600/30 transition-all duration-300 hover:scale-[1.02] cursor-pointer"
-                      >
-                        <Play className="w-4 h-4 fill-white" />
-                        <span>Start New Claim Analysis</span>
-                      </button>
-                    </div>
-
-                    <div className="pt-4 border-t border-slate-800/80 text-xs sm:text-sm text-slate-300 text-left space-y-2">
-                      <div className="flex items-center gap-2.5">
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0" />
-                        <span className="text-slate-300 font-medium">Deterministic check for hard-stop billing errors</span>
-                      </div>
-                      <div className="flex items-center gap-2.5">
-                        <span className="w-2 h-2 rounded-full bg-sky-400 flex-shrink-0" />
-                        <span className="text-slate-300 font-medium">Calibrated ML denial probability scoring</span>
-                      </div>
-                      <div className="flex items-center gap-2.5">
-                        <span className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0" />
-                        <span className="text-slate-300 font-medium">Actionable CARC attribution & work queue routing</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* State 3: Active Adjudication Results */}
-              {currentPrediction && !loading && (
-                <div className="space-y-4 animate-fadeInUp">
-                  {/* Disposition & Risk Gauge Card */}
-                  <PredictionCard
-                    prediction={currentPrediction}
-                    onOpenWhatIf={() => setIsWhatIfOpen(true)}
-                  />
-
-                  {/* Prescriptive Recommendation Box */}
+                {/* 2-Column Grid: Billing Risk Factors & Prescriptive Recommendations */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                  <RiskFactorsList factors={currentPrediction.top_3_risk_factors} />
                   <RecommendationBox
                     action={currentPrediction.recommended_action}
                     routingDecision={currentPrediction.routing_decision}
                   />
-
-                  {/* Top-3 Risk Factors */}
-                  <RiskFactorsList factors={currentPrediction.top_3_risk_factors} />
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -384,15 +263,15 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-800/80 bg-slate-900/60 py-5 mt-8">
-        <div className="max-w-7xl mx-auto px-4 text-center text-sm text-slate-300 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <footer className="border-t border-slate-800/80 bg-slate-900/60 py-4 mt-8">
+        <div className="max-w-7xl mx-auto px-4 text-center text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div>
-            <span className="font-black text-white">ClaimShield AI</span> — Pre-Submission RCM Denial Prevention Engine
+            <span className="font-bold text-slate-300">ClaimShield AI</span> — Pre-Submission RCM Denial Prevention Engine
           </div>
-          <div className="font-mono text-xs sm:text-sm font-bold text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
+          <div className="font-mono text-[11px] text-amber-400">
             SIMULATED / DEMO DATA ONLY — Not clinically validated or payer certified
           </div>
-          <div className="font-medium text-slate-400">
+          <div>
             Microsoft Innovation Club (VIT Chennai)
           </div>
         </div>
