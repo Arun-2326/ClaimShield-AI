@@ -4,15 +4,6 @@ import { Shield, ShieldAlert, Activity, FileSpreadsheet, BarChart3, Database } f
 export default function Navbar({ activeTab, setActiveTab, health, onOpenAnalytics, onOpenUpload }) {
   return (
     <header className="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-40">
-      {/* Persistent Disclaimer Banner */}
-      <div className="bg-amber-500/15 border-b border-amber-500/30 px-4 py-1 text-center text-xs font-medium text-amber-300 flex items-center justify-center gap-2">
-        <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-200 border border-amber-500/40 uppercase tracking-wide">
-          Simulated / Demo Data
-        </span>
-        <span>
-          Microsoft Innovation Club (VIT Chennai) — Internal prototype on synthetic data. No real PHI or payer connectivity.
-        </span>
-      </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
