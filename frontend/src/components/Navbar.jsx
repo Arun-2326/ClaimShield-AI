@@ -16,7 +16,6 @@ export default function Navbar({ activeTab, setActiveTab, health, onOpenAnalytic
               <div className="flex items-center gap-2">
                 <span className="text-xl font-black tracking-tight text-white">ClaimShield</span>
                 <span className="px-1.5 py-0.5 rounded text-[11px] font-bold bg-sky-500/20 text-sky-400 border border-sky-500/30">AI</span>
-                <span className="text-xs text-slate-400 hidden md:inline">| Pre-Submission Prevention</span>
               </div>
               <p className="text-xs text-slate-400 font-medium">Preventing RCM Denials Before EDI 837 Transmission</p>
             </div>
