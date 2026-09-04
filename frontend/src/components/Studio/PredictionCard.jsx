@@ -58,72 +58,82 @@ export default function PredictionCard({ prediction }) {
 
   return (
     <div className="space-y-4 animate-scale-in">
-      {/* 1. Main Routing Decision Banner */}
-      <div className={`p-4 rounded-2xl border ${decisionBadge.bg} flex items-start space-x-3.5 shadow-xl transition-all duration-300 card-hover-glow`}>
-        <div className="p-2.5 rounded-xl bg-black/30 shrink-0 mt-0.5">
-          <DecisionIcon className="w-6 h-6 animate-pulse" />
+      {/* 1. Main Routing Decision Banner (LEVEL 1: MAIN COMMAND) */}
+      <div className={`hud-card-major p-5 rounded-2xl border ${decisionBadge.bg} flex items-start space-x-4 shadow-2xl transition-all duration-300 animate-main-pulse`}>
+        <div className="p-3 rounded-xl bg-black/40 shrink-0 mt-0.5 shadow-inner">
+          <DecisionIcon className="w-7 h-7 animate-bounce" />
         </div>
         <div className="flex-1">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono uppercase tracking-wider font-bold">
-              Routing Decision
+            <span className="badge-major text-[9px]">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping inline-block" />
+              ◈ Level 1: Primary Routing Decision
             </span>
-            <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-black/40 border border-white/10 font-bold">
-              Tier: {risk_tier.toUpperCase()}
+            <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-black/50 border border-white/20 font-bold">
+              AI TIER: {risk_tier.toUpperCase()}
             </span>
           </div>
-          <h2 className="text-xl font-black tracking-tight mt-0.5">
+          <h2 className="text-xl font-black tracking-tight mt-1.5 text-white drop-shadow-md">
             {decisionBadge.title}
           </h2>
-          <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+          <p className="text-xs text-slate-200 mt-1 leading-relaxed font-medium">
             {routing_reason}
           </p>
         </div>
       </div>
 
-      {/* 2. Predicted CARC Reason (if indicated) */}
+      {/* 2. Predicted CARC Reason (LEVEL 2: SUB-DIAGNOSTIC) */}
       {predicted_reason_code && (
-        <div className="p-4 bg-slate-900/80 rounded-2xl border border-slate-800 shadow-lg animate-fade-in card-hover-glow">
+        <div className="hud-card-sub p-4 rounded-xl shadow-md animate-fade-in">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center space-x-2">
-              <span className="px-2.5 py-0.5 rounded-lg bg-sky-500/20 text-sky-300 font-mono font-bold text-xs border border-sky-500/30">
+              <span className="badge-sub text-[10px] bg-indigo-500/20 text-indigo-300 border-indigo-500/40 font-mono font-bold">
                 {predicted_reason_code}
               </span>
               <span className="text-xs font-bold text-slate-200">
                 Most Likely Denial Reason (CARC)
               </span>
             </div>
-            {reason_confidence && (
-              <span className="text-[11px] font-mono text-slate-400">
-                Confidence: {(reason_confidence * 100).toFixed(0)}%
-              </span>
-            )}
+            <div className="flex items-center space-x-2">
+              <span className="badge-sub text-[9px]">◇ SUB-DIAGNOSTIC</span>
+              {reason_confidence && (
+                <span className="text-[11px] font-mono text-slate-400">
+                  Confidence: {(reason_confidence * 100).toFixed(0)}%
+                </span>
+              )}
+            </div>
           </div>
-          <p className="text-xs text-slate-300 leading-relaxed pl-1">
+          <p className="text-xs text-slate-300 leading-relaxed pl-1 font-mono">
             {reason_description}
           </p>
         </div>
       )}
 
-      {/* 3. Recommended Remedial Action */}
-      <div className="p-4 bg-sky-950/40 rounded-2xl border border-sky-800/40 shadow-lg animate-fade-in card-hover-glow">
-        <div className="flex items-center space-x-2 mb-2 text-sky-400">
-          <Lightbulb className="w-4 h-4 text-amber-400 animate-pulse" />
-          <h3 className="text-xs uppercase tracking-wider font-bold">
-            Recommended Preventive Action
-          </h3>
+      {/* 3. Recommended Remedial Action (LEVEL 2: SUB-ACTION) */}
+      <div className="hud-card-sub p-4 rounded-xl shadow-md animate-fade-in">
+        <div className="flex items-center justify-between mb-2 text-indigo-400">
+          <div className="flex items-center space-x-2">
+            <Lightbulb className="w-4 h-4 text-amber-400" />
+            <h3 className="text-xs uppercase tracking-wider font-bold text-slate-200">
+              Recommended Preventive Action
+            </h3>
+          </div>
+          <span className="badge-sub text-[9px]">◇ SUB-ACTION</span>
         </div>
-        <p className="text-xs text-slate-200 leading-relaxed pl-1 font-medium">
+        <p className="text-xs text-slate-300 leading-relaxed pl-1">
           {recommended_action}
         </p>
       </div>
 
-      {/* 4. Non-blocking Validation Warnings */}
+      {/* 4. Non-blocking Validation Warnings (LEVEL 2: SUB-WARNINGS) */}
       {validation_warnings.length > 0 && (
-        <div className="p-3.5 bg-amber-950/30 rounded-2xl border border-amber-500/40 animate-fade-in">
-          <div className="flex items-center space-x-1.5 text-amber-400 text-xs font-semibold mb-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>Pre-Submission Non-Blocking Warnings ({validation_warnings.length})</span>
+        <div className="hud-card-sub p-3.5 rounded-xl border-l-amber-500/80 animate-fade-in">
+          <div className="flex items-center justify-between text-amber-400 text-xs font-semibold mb-2">
+            <div className="flex items-center space-x-1.5">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>Pre-Submission Non-Blocking Warnings ({validation_warnings.length})</span>
+            </div>
+            <span className="badge-sub text-[9px]">◇ SUB-WARNING</span>
           </div>
           <ul className="space-y-1.5 text-xs text-slate-300">
             {validation_warnings.map((w, i) => (

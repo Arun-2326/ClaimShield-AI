@@ -36,17 +36,17 @@ export default function RiskGauge({ score = 0, tier = 'low', confidence = 0.8 })
   const offset = circumference - (pct / 100) * circumference;
 
   return (
-    <div className="hud-card p-5 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden group">
+    <div className="hud-card-major p-6 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden group animate-main-glow">
       {/* Background Holographic Scanline */}
       <div className="scanline-beam animate-scanline-sweep" />
 
       {/* Top HUD Telemetry Header */}
-      <div className="w-full flex items-center justify-between text-[10px] font-mono text-slate-400 pb-2 border-b border-cyber-border/60 mb-2">
-        <span className="flex items-center space-x-1.5 text-cyan-400 font-bold tracking-widest uppercase">
-          <Radio className="w-3 h-3 animate-pulse" />
-          <span>Neural Radar Scope</span>
+      <div className="w-full flex items-center justify-between text-[10px] font-mono text-slate-400 pb-2.5 border-b border-cyber-border/80 mb-2">
+        <span className="badge-major text-[9px]">
+          <Radio className="w-3 h-3 animate-pulse text-cyan-400" />
+          <span>◈ Level 1: Neural Radar Scope</span>
         </span>
-        <span className="text-slate-500">RANGE: 0.0 - 1.0</span>
+        <span className="badge-sub text-[9px]">RANGE: 0.0 - 1.0</span>
       </div>
 
       {/* Massive 360-Degree Animated Radar Scanner */}

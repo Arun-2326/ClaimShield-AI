@@ -9,6 +9,13 @@ for /f "tokens=5" %%a in ('netstat -aon ^| findstr :8000') do (
     taskkill /f /pid %%a >nul 2>&1
 )
 
+if not exist "frontend\dist\index.html" (
+    echo [Setup] Compiling Cyber Cockpit UI frontend...
+    cd frontend
+    call npm run build
+    cd ..
+)
+
 echo 2. Launching ClaimShield AI Unified Server on port 8000...
 echo    (FastAPI Backend + Futuristic 2050 React Cockpit)
 echo.

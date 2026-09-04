@@ -126,7 +126,7 @@ export default function Sidebar({ activePage, setActivePage, isCollapsed, setIsC
         </div>
 
         {/* 2. Navigation Items List */}
-        <nav className="p-3 space-y-1.5">
+        <nav className="p-3 space-y-2">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activePage === item.id;
@@ -138,22 +138,24 @@ export default function Sidebar({ activePage, setActivePage, isCollapsed, setIsC
                   isCollapsed ? 'justify-center p-3' : 'justify-between px-3.5 py-3'
                 } ${
                   isActive
-                    ? 'bg-gradient-to-r from-cyan-500/20 to-indigo-500/10 text-cyan-300 border border-cyan-500/60 shadow-lg shadow-cyan-500/10'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-cyber-card/60 border border-transparent'
+                    ? 'hud-card-major bg-gradient-to-r from-cyan-950/60 to-indigo-950/40 border-cyan-400 text-cyan-200 shadow-xl shadow-cyan-500/20 animate-main-pulse'
+                    : 'hud-card-sub text-slate-400 hover:text-indigo-200 hover:bg-slate-900/80 hover:translate-x-1'
                 }`}
                 title={isCollapsed ? item.label : undefined}
               >
                 <div className="flex items-center space-x-3 truncate">
-                  <div className={`p-1.5 rounded-lg transition-transform duration-200 group-hover:scale-110 ${
-                    isActive ? 'bg-cyan-500/20 text-cyan-400' : 'bg-slate-800/80 text-slate-400'
+                  <div className={`p-2 rounded-lg transition-transform duration-200 group-hover:scale-110 ${
+                    isActive ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/40' : 'bg-slate-800/80 text-slate-400 border border-slate-700/60'
                   }`}>
                     <Icon className="w-4 h-4" />
                   </div>
 
                   {!isCollapsed && (
                     <div className="text-left truncate">
-                      <div className={`text-xs font-bold leading-tight ${isActive ? 'text-cyan-200' : 'text-slate-200'}`}>
-                        {item.label}
+                      <div className="flex items-center space-x-1.5">
+                        <span className={`text-xs font-bold leading-tight ${isActive ? 'text-cyan-200' : 'text-slate-200 group-hover:text-indigo-200'}`}>
+                          {item.label}
+                        </span>
                       </div>
                       <div className="text-[10px] text-slate-500 font-medium truncate">
                         {item.sublabel}
@@ -163,18 +165,14 @@ export default function Sidebar({ activePage, setActivePage, isCollapsed, setIsC
                 </div>
 
                 {!isCollapsed && item.badge && (
-                  <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold border shrink-0 ${
-                    isActive
-                      ? 'bg-cyan-400/20 text-cyan-200 border-cyan-400/40'
-                      : 'bg-slate-800 text-slate-400 border-slate-700'
-                  }`}>
+                  <span className={isActive ? 'badge-major text-[9px]' : 'badge-sub text-[9px]'}>
                     {item.badge}
                   </span>
                 )}
 
                 {/* Glowing Active Left Edge Notch */}
                 {isActive && (
-                  <span className="absolute left-0 top-2 bottom-2 w-1 bg-cyan-400 rounded-r shadow-md shadow-cyan-400" />
+                  <span className="absolute left-0 top-1.5 bottom-1.5 w-1 bg-cyan-400 rounded-r shadow-md shadow-cyan-400" />
                 )}
               </button>
             );

@@ -57,49 +57,78 @@ export default function ClaimStudio({ payers, reference, onClaimAnalyzed, onToas
 
   return (
     <div className="space-y-6">
+      {/* Visual Hierarchy Telemetry Bar */}
+      <div className="flex flex-wrap items-center justify-between px-3 py-2 rounded-xl bg-slate-950/80 border border-slate-800 text-[11px] font-mono">
+        <div className="flex items-center space-x-3">
+          <span className="text-slate-400 font-bold uppercase tracking-wider">Visual Hierarchy Matrix:</span>
+          <span className="badge-major text-[10px]">
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping inline-block" />
+            ◈ Main Command Level: Neon Cyan
+          </span>
+          <span className="badge-sub text-[10px]">
+            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 inline-block" />
+            ◇ Sub-System Detail: Steel Amethyst
+          </span>
+        </div>
+        <span className="text-[10px] text-slate-500 hidden md:inline">
+          Active Encounter: <strong className="text-cyan-400">{claimData.claim_id}</strong>
+        </span>
+      </div>
+
       {/* 1. Sub-Tab Switcher for Studio Views */}
-      <div className="flex flex-wrap items-center justify-between border-b border-slate-800 pb-3 gap-3">
-        <div className="flex items-center space-x-2">
+      <div className="flex flex-wrap items-center justify-between border-b border-slate-800/80 pb-3 gap-3">
+        <div className="flex items-center space-x-2.5">
           <button
             onClick={() => setStudioSubTab('scoring')}
-            className={`flex items-center space-x-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
               studioSubTab === 'scoring'
-                ? 'bg-sky-600 text-white shadow-sm'
-                : 'bg-slate-800/80 text-slate-300 hover:bg-slate-800'
+                ? 'hud-card-major text-cyan-300 shadow-cyan-500/20 animate-main-pulse'
+                : 'hud-card-sub text-slate-400 hover:text-indigo-200'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5" />
+            <Sparkles className={`w-3.5 h-3.5 ${studioSubTab === 'scoring' ? 'text-cyan-400 animate-pulse' : 'text-slate-400'}`} />
             <span>Pre-Submission Risk Scoring</span>
+            {studioSubTab === 'scoring' && (
+              <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
+                ACTIVE
+              </span>
+            )}
           </button>
 
           <button
             onClick={() => setStudioSubTab('edi')}
-            className={`flex items-center space-x-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
               studioSubTab === 'edi'
-                ? 'bg-sky-600 text-white shadow-sm'
-                : 'bg-slate-800/80 text-slate-300 hover:bg-slate-800'
+                ? 'hud-card-major text-cyan-300 shadow-cyan-500/20 animate-main-pulse'
+                : 'hud-card-sub text-slate-400 hover:text-indigo-200'
             }`}
           >
-            <FileCode2 className="w-3.5 h-3.5" />
-            <span>Interactive EDI 837P Inspector</span>
+            <FileCode2 className={`w-3.5 h-3.5 ${studioSubTab === 'edi' ? 'text-cyan-400 animate-pulse' : 'text-slate-400'}`} />
+            <span>EDI 837P Inspector</span>
+            {studioSubTab === 'edi' && (
+              <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
+                ACTIVE
+              </span>
+            )}
           </button>
 
           <button
             onClick={() => setStudioSubTab('scrub')}
-            className={`flex items-center space-x-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
               studioSubTab === 'scrub'
-                ? 'bg-sky-600 text-white shadow-sm'
-                : 'bg-slate-800/80 text-slate-300 hover:bg-slate-800'
+                ? 'hud-card-major text-cyan-300 shadow-cyan-500/20 animate-main-pulse'
+                : 'hud-card-sub text-slate-400 hover:text-indigo-200'
             }`}
           >
-            <Zap className="w-3.5 h-3.5" />
+            <Zap className={`w-3.5 h-3.5 ${studioSubTab === 'scrub' ? 'text-cyan-400 animate-pulse' : 'text-slate-400'}`} />
             <span>Clearinghouse Rules Matrix</span>
+            {studioSubTab === 'scrub' && (
+              <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
+                ACTIVE
+              </span>
+            )}
           </button>
         </div>
-
-        <span className="text-[11px] font-mono text-slate-400 hidden sm:inline">
-          Active Encounter: <strong className="text-sky-400 font-bold">{claimData.claim_id}</strong>
-        </span>
       </div>
 
       {/* 2. Primary Layout */}
@@ -120,29 +149,33 @@ export default function ClaimStudio({ payers, reference, onClaimAnalyzed, onToas
           {/* Right Column: Dynamic Analysis Output (5 Cols) */}
           <div className="lg:col-span-5 space-y-4">
             {loading && (
-              <div className="p-12 bg-slate-900/60 rounded-xl border border-slate-800 flex flex-col items-center justify-center space-y-3 text-center">
-                <div className="w-10 h-10 border-4 border-sky-500 border-t-transparent rounded-full animate-spin" />
-                <p className="text-sm font-semibold text-slate-200">
-                  Running Pre-Submission Inference...
+              <div className="hud-card-major p-12 rounded-2xl flex flex-col items-center justify-center space-y-3 text-center animate-main-glow">
+                <div className="w-12 h-12 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin shadow-lg shadow-cyan-400/30" />
+                <p className="text-sm font-bold text-cyan-300 tracking-wide uppercase">
+                  Running Neural Pre-Submission Inference...
                 </p>
-                <p className="text-xs text-slate-400 max-w-xs">
-                  Executing deterministic validation, feature transformation, and dual-stage denial scoring.
+                <p className="text-xs text-slate-300 max-w-xs font-mono">
+                  Executing deterministic scrubbing, feature extraction, and dual-stage denial scoring.
                 </p>
+                <span className="badge-major text-[9px] mt-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping inline-block" />
+                  ANALYZING 12 FEATURE VECTORS
+                </span>
               </div>
             )}
 
             {error && (
-              <div className="p-5 bg-rose-950/40 rounded-xl border border-rose-500/50 space-y-3">
+              <div className="hud-card-major p-5 rounded-2xl border-rose-500/60 bg-rose-950/40 space-y-3">
                 <div className="flex items-center space-x-2 text-rose-300 font-bold text-sm">
-                  <AlertCircle className="w-5 h-5" />
-                  <span>Pre-Submission Analysis Error</span>
+                  <AlertCircle className="w-5 h-5 text-rose-400 animate-pulse" />
+                  <span>Pre-Submission Analysis Exception</span>
                 </div>
                 <p className="text-xs text-rose-200 leading-relaxed font-mono">
                   {error}
                 </p>
                 <button
                   onClick={handleSubmit}
-                  className="px-3 py-1.5 rounded bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold"
+                  className="px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition-all shadow-md shadow-rose-600/30"
                 >
                   Retry Analysis
                 </button>
@@ -150,15 +183,20 @@ export default function ClaimStudio({ payers, reference, onClaimAnalyzed, onToas
             )}
 
             {!loading && !error && !prediction && (
-              <div className="p-8 bg-slate-900/60 rounded-xl border border-slate-800 text-center space-y-3">
-                <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center mx-auto text-slate-400">
-                  <Shield className="w-6 h-6 text-sky-400" />
+              <div className="hud-card-major p-8 rounded-2xl text-center space-y-3">
+                <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center mx-auto text-cyan-400 shadow-lg shadow-cyan-500/20">
+                  <Shield className="w-7 h-7 text-cyan-400 animate-pulse" />
                 </div>
-                <h3 className="text-sm font-bold text-slate-200">
-                  Ready for Pre-Submission Audit
-                </h3>
+                <div className="space-y-1">
+                  <span className="badge-major text-[10px]">
+                    ◈ Level 1: Executive Audit Ready
+                  </span>
+                  <h3 className="text-base font-bold text-slate-100 tracking-tight">
+                    Awaiting Pre-Submission Claim Submission
+                  </h3>
+                </div>
                 <p className="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
-                  Select a preset scenario on the left or customize claim details, then click <strong>"Analyze Before Submission"</strong> to predict denial probability and recommended remedies.
+                  Select a test scenario on the left or customize claim fields, then click <strong className="text-cyan-300">"Analyze Before Submission"</strong> to predict denial probability and execute remediation.
                 </p>
               </div>
             )}
@@ -167,13 +205,15 @@ export default function ClaimStudio({ payers, reference, onClaimAnalyzed, onToas
               <div className="space-y-4 animate-fade-in">
                 {/* 1-Click Auto-Remediation Banner (If high/medium risk) */}
                 {prediction.risk_score > 0.30 && (
-                  <div className="p-3.5 bg-gradient-to-r from-sky-950/70 to-indigo-950/70 border border-sky-500/40 rounded-xl space-y-2">
+                  <div className="hud-card-major p-4 rounded-2xl border-amber-400/50 bg-gradient-to-r from-amber-950/40 via-cyan-950/30 to-slate-900/90 space-y-2.5">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="font-bold text-sky-300 flex items-center space-x-1.5">
-                        <Zap className="w-3.5 h-3.5 text-amber-400" />
-                        <span>1-Click Auto-Remediation Workflow</span>
+                      <span className="font-bold text-amber-300 flex items-center space-x-2">
+                        <Zap className="w-4 h-4 text-amber-400 animate-bounce" />
+                        <span className="tracking-wide uppercase">◈ Main Action: 1-Click Auto-Remediation Cockpit</span>
                       </span>
-                      <span className="text-[10px] text-slate-400 font-mono">Instant Re-Score</span>
+                      <span className="badge-major text-[9px] bg-amber-500/20 text-amber-300 border-amber-500/40">
+                        INSTANT RE-SCORE
+                      </span>
                     </div>
 
                     <div className="flex flex-wrap gap-2 pt-1">
@@ -181,9 +221,9 @@ export default function ClaimStudio({ payers, reference, onClaimAnalyzed, onToas
                         <button
                           onClick={() => handle1ClickFix('ATTACH_AUTH', 'Obtain & Inject Prior Auth Number')}
                           disabled={remediating}
-                          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold shadow transition-all disabled:opacity-50"
+                          className="flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-cyan-600 to-sky-600 hover:from-cyan-500 hover:to-sky-500 text-white text-xs font-bold shadow-lg shadow-cyan-600/30 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
                         >
-                          <CheckCircle2 className="w-3.5 h-3.5 text-sky-200" />
+                          <CheckCircle2 className="w-3.5 h-3.5 text-cyan-200" />
                           <span>Auto-Inject Prior Auth (Box 23)</span>
                         </button>
                       )}
@@ -192,7 +232,7 @@ export default function ClaimStudio({ payers, reference, onClaimAnalyzed, onToas
                         <button
                           onClick={() => handle1ClickFix('REFRESH_ELIGIBILITY', 'Re-verify 270/271 Real-Time Eligibility')}
                           disabled={remediating}
-                          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-semibold shadow transition-all disabled:opacity-50"
+                          className="flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold shadow-lg shadow-emerald-600/30 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
                         >
                           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-200" />
                           <span>Execute 270/271 Re-Check</span>
@@ -203,7 +243,7 @@ export default function ClaimStudio({ payers, reference, onClaimAnalyzed, onToas
                         <button
                           onClick={() => handle1ClickFix('CLEAR_DUPLICATE', 'Suppress Duplicate Candidate Flag')}
                           disabled={remediating}
-                          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-indigo-700 hover:bg-indigo-600 text-white text-xs font-semibold shadow transition-all disabled:opacity-50"
+                          className="flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold shadow-lg shadow-indigo-600/30 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
                         >
                           <CheckCircle2 className="w-3.5 h-3.5 text-indigo-200" />
                           <span>Clear Duplicate ICN Flag</span>

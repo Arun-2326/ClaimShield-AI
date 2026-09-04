@@ -20,7 +20,73 @@ code, pre, .font-mono {
   background-size: 32px 32px;
 }
 
-/* Futuristic HUD Card with Corner Notches */
+/* ==========================================================================
+   VISUAL HIERARCHY SYSTEM: MAIN THINGS vs SUB THINGS
+   ========================================================================== */
+
+/* --- TIER 1: MAIN THINGS (Executive Command, Core Gauges, Primary CTAs) --- */
+.hud-card-major {
+  position: relative;
+  background: rgba(11, 21, 40, 0.88);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 240, 255, 0.45);
+  box-shadow: 0 0 35px -5px rgba(0, 240, 255, 0.2), inset 0 0 20px rgba(0, 240, 255, 0.04);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hud-card-major::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 14px;
+  height: 14px;
+  border-top: 2.5px solid #00F0FF;
+  border-left: 2.5px solid #00F0FF;
+  box-shadow: 0 0 8px #00F0FF;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.hud-card-major::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 14px;
+  height: 14px;
+  border-bottom: 2.5px solid #00F0FF;
+  border-right: 2.5px solid #00F0FF;
+  box-shadow: 0 0 8px #00F0FF;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.hud-card-major:hover {
+  border-color: rgba(0, 240, 255, 0.75);
+  box-shadow: 0 0 45px rgba(0, 240, 255, 0.3), inset 0 0 25px rgba(0, 240, 255, 0.08);
+  transform: translateY(-2px);
+}
+
+/* --- TIER 2: SUB THINGS (Detail Panels, Modals, CPT/ICD, Line Items, Toggles) --- */
+.hud-card-sub {
+  position: relative;
+  background: rgba(13, 20, 36, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(51, 65, 85, 0.75);
+  border-left: 3px solid rgba(129, 140, 248, 0.65);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hud-card-sub:hover {
+  background: rgba(17, 27, 49, 0.85);
+  border-color: rgba(129, 140, 248, 0.5);
+  border-left-color: #818CF8;
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.15);
+  transform: translateX(3px);
+}
+
+/* Legacy HUD Card compatibility */
 .hud-card {
   position: relative;
   background: rgba(11, 21, 40, 0.75);
@@ -57,6 +123,39 @@ code, pre, .font-mono {
   border-color: rgba(0, 240, 255, 0.5);
   box-shadow: 0 0 25px rgba(0, 240, 255, 0.15), inset 0 0 15px rgba(0, 240, 255, 0.05);
   transform: translateY(-2px);
+}
+
+/* Tier Badges */
+.badge-major {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  background: rgba(0, 240, 255, 0.15);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  color: #00F0FF;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+}
+
+.badge-sub {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 0.5rem;
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(71, 85, 105, 0.6);
+  color: #94A3B8;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.025em;
 }
 
 /* Interactive Cyber Buttons */

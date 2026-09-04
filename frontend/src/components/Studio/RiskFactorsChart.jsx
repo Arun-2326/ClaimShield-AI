@@ -11,13 +11,13 @@ export default function RiskFactorsChart({ factors = [] }) {
   }
 
   return (
-    <div className="p-4 bg-slate-900/60 rounded-xl border border-slate-800">
+    <div className="hud-card-sub p-4 rounded-xl shadow-md">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-xs uppercase tracking-wider font-semibold text-slate-400">
-          Top Risk Drivers (Feature Importance)
+        <h3 className="text-xs uppercase tracking-wider font-semibold text-slate-300 flex items-center space-x-2">
+          <span>Top Risk Drivers (Feature Importance)</span>
         </h3>
-        <span className="text-[11px] text-slate-500 font-mono">
-          Pre-Submission Impact
+        <span className="badge-sub text-[9px]">
+          ◇ SUB-METRICS (SHAP VECTORS)
         </span>
       </div>
 

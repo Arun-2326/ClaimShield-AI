@@ -40,16 +40,19 @@ export default function ClaimForm({
   const currentIcd = claimData.icd_codes[0] || 'M23.22';
 
   return (
-    <div className="hud-card p-5 rounded-2xl shadow-xl space-y-5 animate-fade-in">
+    <div className="hud-card-major p-6 rounded-2xl shadow-2xl space-y-5 animate-fade-in relative overflow-hidden">
+      {/* Top Holographic Scanline */}
+      <div className="scanline-beam animate-scanline-sweep opacity-50" />
+
       {/* 1. Quick Scenario Presets */}
       <div>
         <div className="flex items-center justify-between mb-2.5">
-          <span className="text-xs uppercase tracking-wider font-bold text-slate-300 flex items-center space-x-1.5">
-            <Zap className="w-3.5 h-3.5 text-amber-400" />
+          <span className="text-xs uppercase tracking-wider font-bold text-slate-200 flex items-center space-x-2">
+            <Zap className="w-4 h-4 text-amber-400 animate-bounce" />
             <span>Interactive Scenario Presets (1-Click Test Cases)</span>
           </span>
-          <span className="text-[11px] text-cyan-400 font-mono">
-            Click to populate scenario
+          <span className="badge-sub text-[10px]">
+            ◇ CLICK TO LOAD SCENARIO
           </span>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
@@ -60,21 +63,26 @@ export default function ClaimForm({
                 key={preset.id}
                 type="button"
                 onClick={() => handlePresetSelect(preset)}
-                className={`p-3 rounded-xl text-left transition-all duration-300 transform active:scale-95 group flex flex-col justify-between border ${
+                className={`p-3.5 rounded-xl text-left transition-all duration-300 transform active:scale-95 group flex flex-col justify-between ${
                   isSelected
-                    ? 'bg-cyan-950/60 border-cyan-400 shadow-lg shadow-cyan-500/10 scale-[1.01]'
-                    : 'bg-cyber-card/60 hover:bg-slate-800 border-cyber-border/70 hover:border-cyan-500/50 hover:-translate-y-0.5'
+                    ? 'hud-card-major border-cyan-400 bg-cyan-950/80 shadow-lg shadow-cyan-500/25 scale-[1.02] animate-main-pulse'
+                    : 'hud-card-sub hover:border-indigo-400/50 hover:bg-slate-900/90'
                 }`}
               >
                 <div className="flex items-start justify-between">
-                  <span className={`text-xs font-bold leading-snug line-clamp-1 transition-colors ${isSelected ? 'text-cyan-300' : 'text-slate-200 group-hover:text-cyan-300'}`}>
-                    {preset.label}
-                  </span>
-                  <ArrowUpRight className="w-3 h-3 text-slate-500 group-hover:text-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                  <div className="space-y-0.5">
+                    <span className="text-[9px] font-mono text-slate-400 block">
+                      {isSelected ? '◈ ACTIVE PRESET' : '◇ TEST SCENARIO'}
+                    </span>
+                    <span className={`text-xs font-bold leading-snug line-clamp-1 transition-colors ${isSelected ? 'text-cyan-200' : 'text-slate-200 group-hover:text-indigo-200'}`}>
+                      {preset.label}
+                    </span>
+                  </div>
+                  <ArrowUpRight className={`w-3.5 h-3.5 shrink-0 transition-opacity ${isSelected ? 'text-cyan-400 opacity-100' : 'text-slate-500 group-hover:text-indigo-300 opacity-0 group-hover:opacity-100'}`} />
                 </div>
-                <div className="flex items-center justify-between mt-2 text-[10px]">
+                <div className="flex items-center justify-between mt-2.5 text-[10px]">
                   <span className="text-slate-400 font-medium">{preset.category}</span>
-                  <span className={`px-2 py-0.5 rounded-full font-mono font-semibold border ${preset.badgeColor}`}>
+                  <span className={isSelected ? 'badge-major text-[9px]' : 'badge-sub text-[9px]'}>
                     {preset.expectedOutcome.split(' ')[0]}
                   </span>
                 </div>
@@ -84,7 +92,7 @@ export default function ClaimForm({
         </div>
       </div>
 
-      <div className="border-t border-cyber-border/80" />
+      <div className="border-t border-slate-800" />
 
       {/* 2. Main Claim Intake Form */}
       <form
@@ -127,24 +135,29 @@ export default function ClaimForm({
 
         {/* Professional Rich Selector: Health Plan / Payer */}
         <div>
-          <label className="block text-slate-400 font-medium mb-1 flex items-center justify-between">
-            <span>Health Plan / Payer Destination</span>
-            <span className="text-[10px] text-cyan-400 font-mono">Interactive Plan Picker</span>
+          <label className="block text-slate-400 font-medium mb-1.5 flex items-center justify-between">
+            <span className="flex items-center space-x-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+              <span>Health Plan / Payer Destination</span>
+            </span>
+            <span className="badge-sub text-[9px]">
+              ◇ SUB-SELECTOR (CLICK TO CHANGE)
+            </span>
           </label>
           <div
             onClick={() => setPayerModalOpen(true)}
-            className="p-3 bg-slate-950/90 border border-slate-700/80 hover:border-cyan-400 rounded-xl cursor-pointer transition-all duration-200 group flex items-center justify-between shadow-inner"
+            className="hud-card-sub p-3.5 rounded-xl cursor-pointer group flex items-center justify-between shadow-inner"
           >
             <div className="flex items-center space-x-3 truncate">
-              <div className="w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 flex items-center justify-center font-mono font-bold text-xs shrink-0">
+              <div className="w-9 h-9 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 flex items-center justify-center font-mono font-bold text-xs shrink-0 group-hover:scale-105 transition-transform">
                 {currentPayer.payer_id?.replace('PAYER_', 'P') || 'P1'}
               </div>
               <div className="truncate text-left">
                 <div className="flex items-center space-x-2">
-                  <span className="font-bold text-slate-100 group-hover:text-cyan-300 transition-colors">
+                  <span className="font-bold text-slate-100 group-hover:text-indigo-200 transition-colors">
                     {currentPayer.name}
                   </span>
-                  <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 border border-slate-700">
+                  <span className="badge-sub text-[9px]">
                     {currentPayer.payer_id}
                   </span>
                 </div>
@@ -155,10 +168,10 @@ export default function ClaimForm({
             </div>
 
             <div className="flex items-center space-x-2 shrink-0 pl-2">
-              <span className="px-2 py-1 rounded bg-slate-800 group-hover:bg-cyan-500/20 text-slate-300 group-hover:text-cyan-300 font-medium text-[10px] transition-colors border border-slate-700">
+              <span className="px-2.5 py-1 rounded-lg bg-slate-800/90 group-hover:bg-indigo-500/20 text-slate-300 group-hover:text-indigo-200 font-medium text-[10px] transition-colors border border-slate-700/80">
                 Change Payer
               </span>
-              <ChevronDown className="w-4 h-4 text-slate-500 group-hover:text-cyan-400 transition-colors" />
+              <ChevronDown className="w-4 h-4 text-slate-500 group-hover:text-indigo-300 transition-colors" />
             </div>
           </div>
         </div>
@@ -167,22 +180,27 @@ export default function ClaimForm({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {/* Rich CPT Selector */}
           <div>
-            <label className="block text-slate-400 font-medium mb-1 flex items-center justify-between">
-              <span>Primary Procedure (CPT)</span>
-              <span className="text-[10px] text-cyan-400 font-mono">Fee & Pre-Auth Rules</span>
+            <label className="block text-slate-400 font-medium mb-1.5 flex items-center justify-between">
+              <span className="flex items-center space-x-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
+                <span>Primary Procedure (CPT)</span>
+              </span>
+              <span className="badge-sub text-[9px]">
+                ◇ SUB-SELECTOR
+              </span>
             </label>
             <div
               onClick={() => setCptModalOpen(true)}
-              className="p-3 bg-slate-950/90 border border-slate-700/80 hover:border-cyan-400 rounded-xl cursor-pointer transition-all duration-200 group flex items-center justify-between shadow-inner"
+              className="hud-card-sub p-3.5 rounded-xl cursor-pointer group flex items-center justify-between shadow-inner"
             >
               <div className="flex items-center space-x-2.5 truncate text-left">
-                <div className="p-1.5 rounded-lg bg-sky-500/20 text-sky-400 shrink-0">
+                <div className="p-2 rounded-lg bg-sky-500/20 text-sky-300 shrink-0 group-hover:scale-105 transition-transform">
                   <Stethoscope className="w-4 h-4" />
                 </div>
                 <div className="truncate">
                   <div className="flex items-center space-x-1.5">
-                    <span className="font-mono font-bold text-cyan-400">{currentCpt}</span>
-                    <span className="font-bold text-slate-200 group-hover:text-cyan-300 truncate">
+                    <span className="font-mono font-bold text-sky-400">{currentCpt}</span>
+                    <span className="font-bold text-slate-200 group-hover:text-indigo-200 truncate">
                       {reference?.cpt_codes?.[currentCpt]?.substring(0, 24) || currentCpt}...
                     </span>
                   </div>
@@ -192,28 +210,33 @@ export default function ClaimForm({
                 </div>
               </div>
 
-              <ChevronDown className="w-4 h-4 text-slate-500 group-hover:text-cyan-400 shrink-0 ml-1" />
+              <ChevronDown className="w-4 h-4 text-slate-500 group-hover:text-indigo-300 shrink-0 ml-1" />
             </div>
           </div>
 
           {/* Rich ICD-10 Selector */}
           <div>
-            <label className="block text-slate-400 font-medium mb-1 flex items-center justify-between">
-              <span>Primary Diagnosis (ICD-10)</span>
-              <span className="text-[10px] text-cyan-400 font-mono">LCD Necessity Check</span>
+            <label className="block text-slate-400 font-medium mb-1.5 flex items-center justify-between">
+              <span className="flex items-center space-x-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+                <span>Primary Diagnosis (ICD-10)</span>
+              </span>
+              <span className="badge-sub text-[9px]">
+                ◇ SUB-SELECTOR
+              </span>
             </label>
             <div
               onClick={() => setIcdModalOpen(true)}
-              className="p-3 bg-slate-950/90 border border-slate-700/80 hover:border-cyan-400 rounded-xl cursor-pointer transition-all duration-200 group flex items-center justify-between shadow-inner"
+              className="hud-card-sub p-3.5 rounded-xl cursor-pointer group flex items-center justify-between shadow-inner"
             >
               <div className="flex items-center space-x-2.5 truncate text-left">
-                <div className="p-1.5 rounded-lg bg-purple-500/20 text-purple-400 shrink-0">
+                <div className="p-2 rounded-lg bg-purple-500/20 text-purple-300 shrink-0 group-hover:scale-105 transition-transform">
                   <HeartPulse className="w-4 h-4" />
                 </div>
                 <div className="truncate">
                   <div className="flex items-center space-x-1.5">
                     <span className="font-mono font-bold text-purple-400">{currentIcd}</span>
-                    <span className="font-bold text-slate-200 group-hover:text-cyan-300 truncate">
+                    <span className="font-bold text-slate-200 group-hover:text-indigo-200 truncate">
                       {reference?.icd_codes?.[currentIcd]?.substring(0, 24) || currentIcd}...
                     </span>
                   </div>
@@ -223,7 +246,7 @@ export default function ClaimForm({
                 </div>
               </div>
 
-              <ChevronDown className="w-4 h-4 text-slate-500 group-hover:text-cyan-400 shrink-0 ml-1" />
+              <ChevronDown className="w-4 h-4 text-slate-500 group-hover:text-indigo-300 shrink-0 ml-1" />
             </div>
           </div>
         </div>
@@ -282,101 +305,109 @@ export default function ClaimForm({
         </div>
 
         {/* Animated Interactive Toggle Switches */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-1">
-          {/* Prior Auth Toggle */}
-          <div
-            onClick={() => handleInputChange('prior_auth_flag', !claimData.prior_auth_flag)}
-            className="flex items-center justify-between p-3 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-slate-700 cursor-pointer transition-all duration-200 select-none group"
-          >
-            <span className="text-slate-300 font-medium group-hover:text-slate-100">
-              Prior Auth Attached
-            </span>
-            <div
-              className={`w-9 h-5 rounded-full transition-colors duration-300 p-0.5 relative ${
-                claimData.prior_auth_flag ? 'bg-cyan-400 shadow-md shadow-cyan-400/40' : 'bg-slate-800'
-              }`}
-            >
-              <div
-                className={`w-4 h-4 rounded-full bg-slate-950 transition-transform duration-300 transform ${
-                  claimData.prior_auth_flag ? 'translate-x-4' : 'translate-x-0'
-                }`}
-              />
-            </div>
+        <div>
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-slate-400 font-medium text-[11px]">Encounter Validation Flags:</span>
+            <span className="badge-sub text-[9px]">◇ SUB-CONTROLS</span>
           </div>
-
-          {/* Active Eligibility Toggle */}
-          <div
-            onClick={() => handleInputChange('eligibility_verified', !claimData.eligibility_verified)}
-            className="flex items-center justify-between p-3 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-slate-700 cursor-pointer transition-all duration-200 select-none group"
-          >
-            <span className="text-slate-300 font-medium group-hover:text-slate-100">
-              Active Coverage Verified
-            </span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+            {/* Prior Auth Toggle */}
             <div
-              className={`w-9 h-5 rounded-full transition-colors duration-300 p-0.5 relative ${
-                claimData.eligibility_verified ? 'bg-emerald-400 shadow-md shadow-emerald-400/40' : 'bg-slate-800'
-              }`}
+              onClick={() => handleInputChange('prior_auth_flag', !claimData.prior_auth_flag)}
+              className="hud-card-sub flex items-center justify-between p-3 rounded-xl cursor-pointer select-none group"
             >
+              <span className="text-slate-300 font-medium group-hover:text-indigo-200">
+                Prior Auth
+              </span>
               <div
-                className={`w-4 h-4 rounded-full bg-slate-950 transition-transform duration-300 transform ${
-                  claimData.eligibility_verified ? 'translate-x-4' : 'translate-x-0'
+                className={`w-9 h-5 rounded-full transition-colors duration-300 p-0.5 relative ${
+                  claimData.prior_auth_flag ? 'bg-cyan-400 shadow-md shadow-cyan-400/40' : 'bg-slate-800'
                 }`}
-              />
+              >
+                <div
+                  className={`w-4 h-4 rounded-full bg-slate-950 transition-transform duration-300 transform ${
+                    claimData.prior_auth_flag ? 'translate-x-4' : 'translate-x-0'
+                  }`}
+                />
+              </div>
             </div>
-          </div>
 
-          {/* Clinical Records Toggle */}
-          <div
-            onClick={() => handleInputChange('documentation_complete', !claimData.documentation_complete)}
-            className="flex items-center justify-between p-3 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-slate-700 cursor-pointer transition-all duration-200 select-none group"
-          >
-            <span className="text-slate-300 font-medium group-hover:text-slate-100">
-              Complete Records PWK
-            </span>
+            {/* Active Eligibility Toggle */}
             <div
-              className={`w-9 h-5 rounded-full transition-colors duration-300 p-0.5 relative ${
-                claimData.documentation_complete ? 'bg-purple-400 shadow-md shadow-purple-400/40' : 'bg-slate-800'
-              }`}
+              onClick={() => handleInputChange('eligibility_verified', !claimData.eligibility_verified)}
+              className="hud-card-sub flex items-center justify-between p-3 rounded-xl cursor-pointer select-none group"
             >
+              <span className="text-slate-300 font-medium group-hover:text-indigo-200">
+                Coverage
+              </span>
               <div
-                className={`w-4 h-4 rounded-full bg-slate-950 transition-transform duration-300 transform ${
-                  claimData.documentation_complete ? 'translate-x-4' : 'translate-x-0'
+                className={`w-9 h-5 rounded-full transition-colors duration-300 p-0.5 relative ${
+                  claimData.eligibility_verified ? 'bg-emerald-400 shadow-md shadow-emerald-400/40' : 'bg-slate-800'
                 }`}
-              />
+              >
+                <div
+                  className={`w-4 h-4 rounded-full bg-slate-950 transition-transform duration-300 transform ${
+                    claimData.eligibility_verified ? 'translate-x-4' : 'translate-x-0'
+                  }`}
+                />
+              </div>
             </div>
-          </div>
 
-          {/* Duplicate Candidate Toggle */}
-          <div
-            onClick={() => handleInputChange('duplicate_candidate', !claimData.duplicate_candidate)}
-            className="flex items-center justify-between p-3 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-slate-700 cursor-pointer transition-all duration-200 select-none group"
-          >
-            <span className="text-slate-300 font-medium group-hover:text-slate-100">
-              Duplicate Candidate Flag
-            </span>
+            {/* Clinical Records Toggle */}
             <div
-              className={`w-9 h-5 rounded-full transition-colors duration-300 p-0.5 relative ${
-                claimData.duplicate_candidate ? 'bg-rose-500 shadow-md shadow-rose-500/40' : 'bg-slate-800'
-              }`}
+              onClick={() => handleInputChange('documentation_complete', !claimData.documentation_complete)}
+              className="hud-card-sub flex items-center justify-between p-3 rounded-xl cursor-pointer select-none group"
             >
+              <span className="text-slate-300 font-medium group-hover:text-indigo-200">
+                PWK Docs
+              </span>
               <div
-                className={`w-4 h-4 rounded-full bg-slate-950 transition-transform duration-300 transform ${
-                  claimData.duplicate_candidate ? 'translate-x-4' : 'translate-x-0'
+                className={`w-9 h-5 rounded-full transition-colors duration-300 p-0.5 relative ${
+                  claimData.documentation_complete ? 'bg-purple-400 shadow-md shadow-purple-400/40' : 'bg-slate-800'
                 }`}
-              />
+              >
+                <div
+                  className={`w-4 h-4 rounded-full bg-slate-950 transition-transform duration-300 transform ${
+                    claimData.documentation_complete ? 'translate-x-4' : 'translate-x-0'
+                  }`}
+                />
+              </div>
+            </div>
+
+            {/* Duplicate Candidate Toggle */}
+            <div
+              onClick={() => handleInputChange('duplicate_candidate', !claimData.duplicate_candidate)}
+              className="hud-card-sub flex items-center justify-between p-3 rounded-xl cursor-pointer select-none group"
+            >
+              <span className="text-slate-300 font-medium group-hover:text-indigo-200">
+                Duplicate
+              </span>
+              <div
+                className={`w-9 h-5 rounded-full transition-colors duration-300 p-0.5 relative ${
+                  claimData.duplicate_candidate ? 'bg-rose-500 shadow-md shadow-rose-500/40' : 'bg-slate-800'
+                }`}
+              >
+                <div
+                  className={`w-4 h-4 rounded-full bg-slate-950 transition-transform duration-300 transform ${
+                    claimData.duplicate_candidate ? 'translate-x-4' : 'translate-x-0'
+                  }`}
+                />
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Primary Action Button */}
-        <div className="pt-2">
+        {/* Primary Action Button (MAIN COMMAND) */}
+        <div className="pt-3">
           <button
             type="submit"
             disabled={loading}
-            className="w-full relative overflow-hidden flex items-center justify-center space-x-2 py-3.5 px-6 rounded-xl bg-gradient-to-r from-cyan-500 via-indigo-600 to-cyan-500 bg-[length:200%_auto] hover:bg-right transition-all duration-500 text-black font-extrabold text-sm shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/40 transform hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] disabled:opacity-50"
+            className="w-full relative overflow-hidden flex items-center justify-center space-x-3 py-4 px-6 rounded-2xl bg-gradient-to-r from-cyan-400 via-sky-500 to-cyan-300 bg-[length:200%_auto] text-slate-950 font-black text-sm uppercase tracking-wider shadow-xl shadow-cyan-500/30 hover:shadow-cyan-400/50 transform hover:-translate-y-1 active:translate-y-0 active:scale-[0.98] transition-all duration-300 animate-main-shimmer disabled:opacity-50 group border border-cyan-300/80"
           >
-            <Sparkles className={`w-4 h-4 ${loading ? 'animate-spin' : 'animate-bounce'}`} />
-            <span>{loading ? 'Evaluating Pre-Submission Denial Risk...' : 'Analyze Before Submission'}</span>
+            <Sparkles className={`w-5 h-5 text-slate-950 ${loading ? 'animate-spin' : 'animate-bounce'}`} />
+            <span className="tracking-widest">
+              {loading ? 'Evaluating Pre-Submission Denial Risk...' : '◈ Execute Pre-Submission Neural Audit'}
+            </span>
           </button>
         </div>
       </form>

@@ -38,16 +38,16 @@ export default function WhatIfSimulator({ currentClaim, basePrediction }) {
     : null;
 
   return (
-    <div className="p-4 bg-slate-900/80 rounded-2xl border border-slate-800 shadow-xl space-y-4 animate-fade-in">
-      <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
+    <div className="hud-card-sub p-5 rounded-2xl shadow-xl space-y-4 animate-fade-in">
+      <div className="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
         <div className="flex items-center space-x-2">
-          <Sliders className="w-4 h-4 text-sky-400" />
+          <Sliders className="w-4 h-4 text-indigo-400" />
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200">
-            Interactive "What-If" Counterfactual Remediation Simulator
+            "What-If" Counterfactual Remediation Simulator
           </h3>
         </div>
-        <span className="text-[10px] text-slate-400 font-mono">
-          Simulate pre-submission fixes
+        <span className="badge-sub text-[9px]">
+          ◇ SUB-WORKBENCH
         </span>
       </div>
 
@@ -55,18 +55,18 @@ export default function WhatIfSimulator({ currentClaim, basePrediction }) {
         {/* Prior Auth Toggle */}
         <div
           onClick={() => handleSimToggle('prior_auth_flag')}
-          className="flex items-center justify-between p-3 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-slate-700 cursor-pointer select-none transition-all duration-200 group"
+          className="hud-card-sub flex items-center justify-between p-3 rounded-xl cursor-pointer select-none group"
         >
-          <span className="text-slate-300 font-medium group-hover:text-slate-100">
+          <span className="text-slate-300 font-medium group-hover:text-indigo-200">
             Prior Auth Attached
           </span>
           <div
             className={`w-9 h-5 rounded-full transition-colors duration-300 p-0.5 relative ${
-              simClaim.prior_auth_flag ? 'bg-sky-500 shadow-md shadow-sky-500/40' : 'bg-slate-800'
+              simClaim.prior_auth_flag ? 'bg-indigo-400 shadow-md shadow-indigo-400/40' : 'bg-slate-800'
             }`}
           >
             <div
-              className={`w-4 h-4 rounded-full bg-white transition-transform duration-300 transform ${
+              className={`w-4 h-4 rounded-full bg-slate-950 transition-transform duration-300 transform ${
                 simClaim.prior_auth_flag ? 'translate-x-4' : 'translate-x-0'
               }`}
             />
@@ -76,18 +76,18 @@ export default function WhatIfSimulator({ currentClaim, basePrediction }) {
         {/* Eligibility Verified Toggle */}
         <div
           onClick={() => handleSimToggle('eligibility_verified')}
-          className="flex items-center justify-between p-3 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-slate-700 cursor-pointer select-none transition-all duration-200 group"
+          className="hud-card-sub flex items-center justify-between p-3 rounded-xl cursor-pointer select-none group"
         >
-          <span className="text-slate-300 font-medium group-hover:text-slate-100">
+          <span className="text-slate-300 font-medium group-hover:text-indigo-200">
             Active Coverage Verified
           </span>
           <div
             className={`w-9 h-5 rounded-full transition-colors duration-300 p-0.5 relative ${
-              simClaim.eligibility_verified ? 'bg-emerald-500 shadow-md shadow-emerald-500/40' : 'bg-slate-800'
+              simClaim.eligibility_verified ? 'bg-emerald-400 shadow-md shadow-emerald-400/40' : 'bg-slate-800'
             }`}
           >
             <div
-              className={`w-4 h-4 rounded-full bg-white transition-transform duration-300 transform ${
+              className={`w-4 h-4 rounded-full bg-slate-950 transition-transform duration-300 transform ${
                 simClaim.eligibility_verified ? 'translate-x-4' : 'translate-x-0'
               }`}
             />
@@ -97,18 +97,18 @@ export default function WhatIfSimulator({ currentClaim, basePrediction }) {
         {/* Documentation Complete Toggle */}
         <div
           onClick={() => handleSimToggle('documentation_complete')}
-          className="flex items-center justify-between p-3 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-slate-700 cursor-pointer select-none transition-all duration-200 group"
+          className="hud-card-sub flex items-center justify-between p-3 rounded-xl cursor-pointer select-none group"
         >
-          <span className="text-slate-300 font-medium group-hover:text-slate-100">
+          <span className="text-slate-300 font-medium group-hover:text-indigo-200">
             Complete Clinical Documentation
           </span>
           <div
             className={`w-9 h-5 rounded-full transition-colors duration-300 p-0.5 relative ${
-              simClaim.documentation_complete ? 'bg-indigo-500 shadow-md shadow-indigo-500/40' : 'bg-slate-800'
+              simClaim.documentation_complete ? 'bg-purple-400 shadow-md shadow-purple-400/40' : 'bg-slate-800'
             }`}
           >
             <div
-              className={`w-4 h-4 rounded-full bg-white transition-transform duration-300 transform ${
+              className={`w-4 h-4 rounded-full bg-slate-950 transition-transform duration-300 transform ${
                 simClaim.documentation_complete ? 'translate-x-4' : 'translate-x-0'
               }`}
             />
@@ -118,9 +118,9 @@ export default function WhatIfSimulator({ currentClaim, basePrediction }) {
         {/* Duplicate Candidate Toggle */}
         <div
           onClick={() => handleSimToggle('duplicate_candidate')}
-          className="flex items-center justify-between p-3 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-slate-700 cursor-pointer select-none transition-all duration-200 group"
+          className="hud-card-sub flex items-center justify-between p-3 rounded-xl cursor-pointer select-none group"
         >
-          <span className="text-slate-300 font-medium group-hover:text-slate-100">
+          <span className="text-slate-300 font-medium group-hover:text-indigo-200">
             Duplicate Candidate Flag
           </span>
           <div
@@ -129,7 +129,7 @@ export default function WhatIfSimulator({ currentClaim, basePrediction }) {
             }`}
           >
             <div
-              className={`w-4 h-4 rounded-full bg-white transition-transform duration-300 transform ${
+              className={`w-4 h-4 rounded-full bg-slate-950 transition-transform duration-300 transform ${
                 simClaim.duplicate_candidate ? 'translate-x-4' : 'translate-x-0'
               }`}
             />
@@ -141,7 +141,7 @@ export default function WhatIfSimulator({ currentClaim, basePrediction }) {
         type="button"
         onClick={runSimulation}
         disabled={simulating}
-        className="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-750 text-sky-300 hover:text-sky-200 font-bold text-xs border border-slate-700/80 hover:border-sky-500/50 flex items-center justify-center space-x-2 transition-all duration-300 transform hover:-translate-y-0.5 active:scale-95 shadow-md shadow-slate-950/50"
+        className="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-750 text-indigo-200 hover:text-white font-bold text-xs border border-indigo-900/50 hover:border-indigo-400/50 flex items-center justify-center space-x-2 transition-all duration-300 transform hover:-translate-y-0.5 active:scale-95 shadow-md"
       >
         <RefreshCw className={`w-3.5 h-3.5 ${simulating ? 'animate-spin' : ''}`} />
         <span>Recalculate Impact of Remediation</span>
@@ -149,7 +149,7 @@ export default function WhatIfSimulator({ currentClaim, basePrediction }) {
 
       {/* Comparison Delta Display */}
       {simPrediction && basePrediction && (
-        <div className="p-3.5 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-between text-xs animate-scale-in">
+        <div className="hud-card-sub p-3.5 rounded-xl flex items-center justify-between text-xs animate-scale-in">
           <div>
             <span className="text-slate-400 block text-[11px]">Before Remediation</span>
             <span className="font-mono font-bold text-slate-200 text-sm">
@@ -157,7 +157,7 @@ export default function WhatIfSimulator({ currentClaim, basePrediction }) {
             </span>
           </div>
 
-          <ArrowRight className="w-4 h-4 text-sky-400 animate-pulse" />
+          <ArrowRight className="w-4 h-4 text-indigo-400 animate-pulse" />
 
           <div>
             <span className="text-slate-400 block text-[11px]">After Remediation</span>

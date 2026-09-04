@@ -70,6 +70,30 @@ export default {
           '0%, 100%': { opacity: '0.7', filter: 'drop-shadow(0 0 10px rgba(0, 240, 255, 0.4))' },
           '50%': { opacity: '1', filter: 'drop-shadow(0 0 25px rgba(0, 240, 255, 0.8))' },
         },
+        mainGlow: {
+          '0%, 100%': { boxShadow: '0 0 20px rgba(0, 240, 255, 0.15), inset 0 0 15px rgba(0, 240, 255, 0.05)' },
+          '50%': { boxShadow: '0 0 45px rgba(0, 240, 255, 0.35), inset 0 0 25px rgba(0, 240, 255, 0.12)' },
+        },
+        mainPulse: {
+          '0%, 100%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.012)' },
+        },
+        mainShimmer: {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
+        },
+        subFloat: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-3px)' },
+        },
+        subPulse: {
+          '0%, 100%': { opacity: '0.88' },
+          '50%': { opacity: '1' },
+        },
+        spinSlow: {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' },
+        },
       },
       animation: {
         'fade-in': 'fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards',
@@ -81,6 +105,12 @@ export default {
         'scanline-sweep': 'scanline 6s linear infinite',
         'shimmer': 'shimmer 2.5s infinite linear',
         'neon-pulse': 'neonPulse 3s infinite ease-in-out',
+        'main-glow': 'mainGlow 4s ease-in-out infinite',
+        'main-pulse': 'mainPulse 3s ease-in-out infinite',
+        'main-shimmer': 'mainShimmer 2.5s infinite linear',
+        'sub-float': 'subFloat 4s ease-in-out infinite',
+        'sub-pulse': 'subPulse 3s ease-in-out infinite',
+        'spin-slow': 'spinSlow 14s linear infinite',
       }
     },
   },

@@ -38,48 +38,51 @@ export default function RulesMatrix({ claimData, onToast }) {
 
   return (
     <div className="space-y-4">
-      {/* Top Scrubbing Summary Card */}
-      <div className="p-4 bg-slate-900/80 rounded-xl border border-slate-800 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center space-x-3">
-          <div className="p-2.5 rounded-xl bg-sky-500/15 border border-sky-500/30 text-sky-400">
-            <Zap className="w-5 h-5" />
+      {/* Top Scrubbing Summary Card (LEVEL 1: MAIN COMMAND) */}
+      <div className="hud-card-major p-5 rounded-2xl flex flex-wrap items-center justify-between gap-4 animate-main-pulse">
+        <div className="flex items-center space-x-3.5">
+          <div className="p-3 rounded-xl bg-cyan-500/15 border border-cyan-500/40 text-cyan-300 shadow-md shadow-cyan-500/20">
+            <Zap className="w-6 h-6 text-cyan-400 animate-bounce" />
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <h3 className="text-xs uppercase font-bold tracking-wider text-slate-200">
-                Clearinghouse Pre-Submission Scrubbing Matrix
-              </h3>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">
+              <span className="badge-major text-[9px]">
+                ◈ Level 1: Clearinghouse Scrubbing Engine
+              </span>
+              <span className="badge-sub text-[9px]">
                 Rule Base v2.4.1
               </span>
             </div>
+            <h3 className="text-sm uppercase font-bold tracking-wider text-slate-100 mt-1">
+              Deterministic Clearinghouse Pre-Submission Matrix
+            </h3>
             <p className="text-xs text-slate-400 mt-0.5">
-              Deterministic clinical, coverage, and coding edits applied before 837 generation.
+              Clinical edits, CMS timely filing limits, LCD medical necessity, and NCCI PTP bundling rules.
             </p>
           </div>
         </div>
 
         {/* Clean Claim Score & Stats */}
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-4">
           <div className="text-right">
             <span className="text-[10px] text-slate-400 uppercase font-semibold block">Clean Claim Score</span>
-            <span className={`text-xl font-extrabold font-mono ${clean_claim_score >= 80 ? 'text-emerald-400' : 'text-amber-400'}`}>
+            <span className={`text-2xl font-black font-mono tracking-tight ${clean_claim_score >= 80 ? 'text-emerald-400' : 'text-amber-400'}`}>
               {clean_claim_score}%
             </span>
           </div>
 
           <div className="flex items-center space-x-1.5 text-xs font-mono">
-            <span className="px-2 py-1 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+            <span className="px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-bold text-[11px]">
               {passed} Pass
             </span>
             {warnings > 0 && (
-              <span className="px-2 py-1 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">
+              <span className="px-2.5 py-1 rounded-lg bg-amber-500/15 text-amber-300 border border-amber-500/30 font-bold text-[11px]">
                 {warnings} Warn
               </span>
             )}
             {failed > 0 && (
-              <span className="px-2 py-1 rounded bg-rose-500/15 text-rose-300 border border-rose-500/30">
-                {failed} Fail
+              <span className="px-2.5 py-1 rounded-lg bg-rose-500/15 text-rose-300 border border-rose-500/30 font-bold text-[11px]">
+                {failed} Block
               </span>
             )}
           </div>
@@ -87,15 +90,15 @@ export default function RulesMatrix({ claimData, onToast }) {
           <button
             onClick={runScrub}
             disabled={loading}
-            className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700"
+            className="p-2.5 rounded-xl bg-slate-800/90 hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-300 border border-slate-700 hover:border-cyan-500/40 transition-colors"
             title="Re-run Scrubber"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-cyan-400' : ''}`} />
           </button>
         </div>
       </div>
 
-      {/* Rules Matrix List */}
+      {/* Rules Matrix List (LEVEL 2: SUB-ITEMS) */}
       <div className="space-y-2.5">
         {rules.map((rule) => {
           let statusBadge = {
@@ -122,12 +125,12 @@ export default function RulesMatrix({ claimData, onToast }) {
           return (
             <div
               key={rule.rule_id}
-              className={`p-3.5 rounded-xl border transition-colors flex items-start justify-between gap-3 text-xs ${
+              className={`hud-card-sub p-4 rounded-xl flex items-start justify-between gap-3 text-xs ${
                 rule.status === 'FAIL'
-                  ? 'bg-rose-950/20 border-rose-500/30'
+                  ? 'border-l-rose-500/90 bg-rose-950/20'
                   : rule.status === 'WARN'
-                  ? 'bg-amber-950/20 border-amber-500/30'
-                  : 'bg-slate-900/60 border-slate-800/80 hover:bg-slate-900/90'
+                  ? 'border-l-amber-500/90 bg-amber-950/20'
+                  : ''
               }`}
             >
               <div className="space-y-1 flex-1">
