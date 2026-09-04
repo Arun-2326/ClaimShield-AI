@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
+import MenuBar from './components/MenuBar';
 import CommandBar from './components/CommandBar';
 import Sidebar from './components/Sidebar';
 import ClaimStudio from './components/Studio/ClaimStudio';
@@ -8,6 +9,9 @@ import ClaimQueue from './components/Queue/ClaimQueue';
 import MetricsDashboard from './components/Intelligence/MetricsDashboard';
 import BatchAnalysis from './components/Batch/BatchAnalysis';
 import PolicyNetwork from './components/Network/PolicyNetwork';
+import PayerSelectModal from './components/Studio/PayerSelectModal';
+import CptSelectModal from './components/Studio/CptSelectModal';
+import IcdSelectModal from './components/Studio/IcdSelectModal';
 import Toast from './components/Toast';
 import { checkHealth, fetchReferenceTaxonomy } from './api/client';
 
@@ -19,6 +23,11 @@ export default function App() {
   const [reference, setReference] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [toast, setToast] = useState(null);
+
+  // Global modals triggered from top MenuBar
+  const [globalPayerModalOpen, setGlobalPayerModalOpen] = useState(false);
+  const [globalCptModalOpen, setGlobalCptModalOpen] = useState(false);
+  const [globalIcdModalOpen, setGlobalIcdModalOpen] = useState(false);
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
@@ -43,10 +52,19 @@ export default function App() {
         setIsCollapsed={setIsSidebarCollapsed}
       />
 
-      {/* 2. Facility Context & Real-Time Telemetry Bar */}
+      {/* 2. Top Professional Enterprise Menu Bar */}
+      <MenuBar
+        onOpenPayerModal={() => setGlobalPayerModalOpen(true)}
+        onOpenCptModal={() => setGlobalCptModalOpen(true)}
+        onOpenIcdModal={() => setGlobalIcdModalOpen(true)}
+        onNavigatePage={(page) => setActivePage(page)}
+        onToast={showToast}
+      />
+
+      {/* 3. Facility Context & Real-Time Telemetry Bar */}
       <CommandBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 
-      {/* 3. Main Cockpit Layout: Left Sidebar + Right Dedicated Page Viewport */}
+      {/* 4. Main Cockpit Layout: Left Sidebar + Right Dedicated Page Viewport */}
       <div className="flex-1 flex overflow-hidden">
         {/* Futuristic Collapsible Sidebar */}
         <Sidebar
@@ -110,7 +128,7 @@ export default function App() {
         </main>
       </div>
 
-      {/* 4. Cyber Footer */}
+      {/* 5. Cyber Footer */}
       <footer className="border-t border-cyber-border/80 bg-cyber-dark/90 py-3 text-center text-xs text-slate-500">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center space-x-1.5 text-slate-400">
@@ -124,7 +142,7 @@ export default function App() {
         </div>
       </footer>
 
-      {/* 5. Active Toast Notifications */}
+      {/* 6. Active Toast Notifications */}
       {toast && (
         <Toast
           message={toast.message}
@@ -132,6 +150,34 @@ export default function App() {
           onClose={() => setToast(null)}
         />
       )}
+
+      {/* 7. Global Exploratory Modals Triggered from MenuBar */}
+      <PayerSelectModal
+        isOpen={globalPayerModalOpen}
+        onClose={() => setGlobalPayerModalOpen(false)}
+        selectedPayerId="PAYER_001"
+        onSelectPayer={(pId) => {
+          showToast(`Selected ${pId} from Menu Bar Directory`, 'info');
+        }}
+      />
+
+      <CptSelectModal
+        isOpen={globalCptModalOpen}
+        onClose={() => setGlobalCptModalOpen(false)}
+        selectedCpt="29881"
+        onSelectCpt={(cpt) => {
+          showToast(`Selected CPT ${cpt} from Clinical Codebook`, 'info');
+        }}
+      />
+
+      <IcdSelectModal
+        isOpen={globalIcdModalOpen}
+        onClose={() => setGlobalIcdModalOpen(false)}
+        selectedIcd="M23.22"
+        onSelectIcd={(icd) => {
+          showToast(`Selected ICD ${icd} from Clinical Codebook`, 'info');
+        }}
+      />
     </div>
   );
 }
