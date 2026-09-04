@@ -1,8 +1,47 @@
-# ClaimShield AI — System Architecture Specification
+# ClaimShield AI — Architecture Specification
 
-## 1. High-Level Pipeline Architecture
+## 1. System Overview
 
-ClaimShield AI functions as an upstream pre-submission decision-support intelligence engine positioned between the Electronic Health Record (EHR) / Practice Management (PM) claim generation stage and the Electronic Data Interchange (EDI) clearinghouse dispatch layer.
+ClaimShield AI is a pre-submission intelligence engine designed to intercept preventable claim denials before transmission to healthcare payers. Traditional revenue cycle management (RCM) workflows discover defects only after weeks of adjudication when an Electronic Remittance Advice (ERA / X12 835) arrives with denial remark codes. 
+
+ClaimShield AI shifts denial detection upstream into the provider billing boundary:
+
+```text
+Claim Intake (EHR / Form / CSV)
+   │
+   ▼
+Deterministic Validation Layer
+   ├── Hard Blocks (Schema, Negative Amounts, Duplicates, Unknown Payers) ──► BLOCK_UNTIL_VALID
+   └── Non-Blocking Warnings (Unknown Codes, Stale Eligibility)
+   │
+   ▼
+Pre-Submission Feature Extraction Pipeline (Strict Leakage Audit Guard)
+   │
+   ▼
+Stage 1: Binary Denial-Risk Estimator (HistGradientBoosting / RandomForest)
+   ├── Denial Probability p ∈ [0.0, 1.0]
+   └── Model Confidence Metric
+   │
+   ▼
+Stage 2: CARC Denial Reason Categorization (Multiclass Forest / Transparent Mapping)
+   ├── Predicted Reason Code (e.g. CO-197, CO-29, CO-27)
+   └── Reason Confidence
+   │
+   ▼
+Explainability & Recommendation Layer
+   ├── Top-3 Risk Factor Directional Contributions
+   └── Plain-English Actionable Remediation Checklist
+   │
+   ▼
+Policy-Driven Routing Engine
+   ├── Risk < 0.30 ─────────────────────────────► RELEASE
+   ├── 0.30 <= Risk <= 0.70 or Low Conf ────────► REVIEW
+   └── Risk > 0.70 ─────────────────────────────► HOLD_FOR_CORRECTION
+```
+
+---
+
+## 2. Architecture Diagram
 
 ```mermaid
 flowchart LR
@@ -10,60 +49,45 @@ flowchart LR
     B --> C[Deterministic Pre-Submission Checks]
 
     C -->|Invalid or confirmed duplicate| D[Block Until Valid]
-    C -->|Valid claim| E[Feature Engineering Pipeline]
+    C -->|Valid claim| E[Feature Engineering]
 
-    E --> F[Binary Denial-Risk Model<br/>RandomForestClassifier]
-    F --> G[Reason Classifier / CARC Attribution]
-    G --> H[Billing Explanation Layer]
+    E --> F[Binary Denial-Risk Model]
+    F --> G[Reason Classifier or CARC Mapping]
+    G --> H[Explanation Layer]
     H --> I[Recommendation Engine]
-    I --> J[Routing Policy Engine]
+    I --> J[Routing Policy]
 
-    J -->|Risk < 0.30| K[Release for Billing]
-    J -->|Risk 0.30-0.70 or Low Conf| L[Manual Review Queue]
-    J -->|Risk > 0.70| M[Hold for Correction]
+    J -->|Low risk| K[Release]
+    J -->|Medium risk or low confidence| L[Manual Review]
+    J -->|High risk| M[Hold for Correction]
 
-    K --> N[Unified API & React Console]
+    K --> N[Dashboard / API Response]
     L --> N
     M --> N
     D --> N
 
-    N --> O[Adjudication Feedback Log]
-    O --> P[Model Monitoring & Retraining]
+    N --> O[Outcome Feedback Log]
+    O --> P[Future Retraining / Monitoring]
 ```
 
-## 2. Component Breakdown
+---
 
-### 2.1 Deterministic Pre-Submission Validation Layer
-- **Responsibility:** Executes strict syntax and reference integrity checks prior to machine-learning inference.
-- **Failures Handled (`BLOCK_UNTIL_VALID`):**
-  - Missing mandatory fields (claim ID, patient ID, procedure codes, diagnosis codes)
-  - Negative or zero claim charges
-  - Future service dates
-  - Unrecognized clearinghouse destination payers (returns HTTP 404)
-  - Confirmed duplicate claim submissions (returns HTTP 409)
-- **Non-Fatal Warnings:**
-  - Unverified eligibility or stale eligibility checks (>30 days old)
-  - Incomplete documentation flags
-  - Unknown CPT/ICD codes outside the reference dictionary
-  - High dollar charges (> $2,500)
+## 3. Separation of Concerns
 
-### 2.2 Feature Engineering & Leakage Guard
-- **Pre-Submission Feature Extraction:** Transforms raw clinical and operational attributes into a standardized numeric matrix of 27 features (one-hot encoded payers, specialty indicators, interaction flags such as `prior_auth_mismatch`).
-- **Leakage Prevention:** Explicit assertion verifying that post-submission fields (`will_be_denied`, `actual_status`, `payment_amount`, `remittance_date`, `appeal_outcome`) never enter the feature matrix.
+1. **Deterministic Validation ≠ Probabilistic Prediction**:
+   - Hard failures such as negative dollar amounts, malformed service dates, unknown payer IDs, or confirmed duplicates never reach the ML inference stage. They route deterministically to `BLOCK_UNTIL_VALID` (or HTTP 404/409).
+   - Unknown clinical codes produce non-blocking warnings and use generalized baseline features rather than crashing.
+2. **Pre-Submission Feature Boundary**:
+   - Zero post-submission adjudication information (e.g., paid amount, remittance date, actual denial code) is allowed into the feature matrix.
+   - Programmatically audited via `backend/ml/preprocessor.py` and unit-tested in `tests/test_leakage.py`.
+3. **Transparent Explainability**:
+   - Feature importances and directional contributions (`increases_risk` / `decreases_risk`) are translated into billing-specialist terminology (e.g. Box 23 / 837P Loop 2300 prior authorization instructions).
 
-### 2.3 Machine Learning Layer
-- **Stage 1 (Binary Risk Model):** Calibrated `RandomForestClassifier` (100 estimators, max depth 8, balanced class weighting) predicting continuous denial probability $p \in [0.0, 1.0]$.
-- **Stage 2 (CARC Reason Attribution):** Secondary classifier trained exclusively on denied claims mapping feature attribution vectors to the 8 primary CARC categories.
-- **Model Confidence Calculation:** Assesses prediction stability based on distance from the decision boundary: $c = 0.50 + |p - 0.50|$.
+---
 
-### 2.4 Explanation & Recommendation Layer
-- **Billing Language Translation:** Converts raw feature importances and factor deltas into intuitive clinical and operational explanations.
-- **Prescriptive Recommendation Engine:** Provides prioritized step-by-step guidance on remediating the flagged defect (e.g. obtaining prior authorization numbers, executing 270/271 inquiries, appending NCCI modifiers).
+## 4. Production Integration Boundary (Future State)
 
-### 2.5 Routing Policy Engine
-- **Configurable Risk Thresholds:**
-  - `RELEASE`: $p < 0.30$ and $c \ge 0.55$
-  - `REVIEW`: $0.30 \le p \le 0.70$ or $c < 0.55$
-  - `HOLD_FOR_CORRECTION`: $p > 0.70$
-  - `BLOCK_UNTIL_VALID`: Deterministic validation error or duplicate
-- **Policy Version Tracking:** Emits `policy_version` (`routing-v1.0`) with every evaluation for auditability.
+In an enterprise hospital network:
+- **Intake**: Ingestion of X12 837P (Professional) and 837I (Institutional) flat files from clearinghouses or EHRs (Epic Resolute, Cerner Soarian).
+- **Outcomes**: Ingestion of X12 835 ERA remittance feeds to automatically close the feedback loop for active model retraining and drift detection.
+- **Compliance**: Integration behind HIPAA Business Associate Agreements (BAA), TLS 1.3 encryption in transit, AES-256 at rest, role-based access control (RBAC), and SOC2 Type II audit trails.

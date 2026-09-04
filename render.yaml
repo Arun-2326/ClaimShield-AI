@@ -1,9 +1,11 @@
 services:
   - type: web
     name: claimshield-ai
-    runtime: docker
-    plan: free
-    region: oregon
+    env: python
+    buildCommand: "pip install -r requirements.txt && python -m backend.ml.train && cd frontend && npm install && npm run build && cd .."
+    startCommand: "python -m uvicorn backend.main:app --host 0.0.0.0 --port $PORT"
     envVars:
-      - key: PORT
-        value: 10000
+      - key: PYTHON_VERSION
+        value: 3.11.8
+      - key: NODE_VERSION
+        value: 20.11.0

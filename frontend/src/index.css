@@ -3,25 +3,104 @@
 @tailwind utilities;
 
 :root {
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color-scheme: dark;
 }
 
-code, kbd, samp, pre {
-  font-family: 'JetBrains Mono', monospace;
+code, pre, .font-mono {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
 }
 
-/* Custom modern scrollbars */
+/* Perspective Cyber Grid Background */
+.cyber-grid-bg {
+  background-color: #030712;
+  background-image: 
+    linear-gradient(to right, rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Futuristic HUD Card with Corner Notches */
+.hud-card {
+  position: relative;
+  background: rgba(11, 21, 40, 0.75);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(30, 58, 95, 0.8);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hud-card::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 10px;
+  height: 10px;
+  border-top: 2px solid #00F0FF;
+  border-left: 2px solid #00F0FF;
+  pointer-events: none;
+}
+
+.hud-card::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 10px;
+  height: 10px;
+  border-bottom: 2px solid #00F0FF;
+  border-right: 2px solid #00F0FF;
+  pointer-events: none;
+}
+
+.hud-card:hover {
+  border-color: rgba(0, 240, 255, 0.5);
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.15), inset 0 0 15px rgba(0, 240, 255, 0.05);
+  transform: translateY(-2px);
+}
+
+/* Interactive Cyber Buttons */
+.btn-cyber {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-cyber:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+}
+
+.btn-cyber:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+/* Laser Scanline Effect */
+.scanline-beam {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #00F0FF, transparent);
+  box-shadow: 0 0 12px #00F0FF;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Custom cyber scrollbars */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #0f172a;
+  background: #030712;
 }
 ::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 4px;
+  background: #1E3A5F;
+  border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: #00F0FF;
+  box-shadow: 0 0 8px #00F0FF;
 }

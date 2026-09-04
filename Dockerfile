@@ -1,34 +1,33 @@
+# Multi-stage production build for ClaimShield AI
 # Stage 1: Build React Frontend
 FROM node:20-alpine AS frontend-builder
 WORKDIR /app/frontend
 COPY frontend/package*.json ./
-RUN npm ci
+RUN npm install
 COPY frontend/ ./
 RUN npm run build
 
-# Stage 2: Python Backend with Unified Static Serving
+# Stage 2: Python Backend Runner
 FROM python:3.11-slim
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+ENV PYTHONUNBUFFERED=1 \
+    PORT=8000
 
-# Install Python dependencies
-COPY backend/requirements.txt ./backend/
-RUN pip install --no-cache-dir -r backend/requirements.txt
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend application source code
 COPY backend/ ./backend/
+COPY data/ ./data/
+COPY docs/ ./docs/
+COPY tests/ ./tests/
 
-# Copy built React static assets from Stage 1 into expected path
+# Copy compiled frontend from Stage 1
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
-# Ensure PORT is read dynamically from cloud hosting environments
-ENV PORT=8000
+# Train models and generate synthetic artifacts
+RUN python -m backend.ml.train
+
 EXPOSE 8000
 
-WORKDIR /app/backend
-CMD sh -c "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"
+CMD ["sh", "-c", "python -m uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

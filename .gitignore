@@ -21,28 +21,23 @@ wheels/
 .installed.cfg
 *.egg
 .pytest_cache/
-.coverage
-htmlcov/
-venv/
-.venv/
-ENV/
 
-# Node / Frontend
-frontend/node_modules/
-frontend/dist/
-frontend/.vite/
-frontend/npm-debug.log*
-frontend/yarn-debug.log*
-frontend/yarn-error.log*
-
-# Database & local state
-backend/data/*.db
+# SQLite
+*.db
 *.sqlite3
+
+# Node / React
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+dist/
+dist-ssr/
+*.local
 
 # Environment & IDE
 .env
 .DS_Store
-Thumbs.db
 .vscode/
 .idea/
-cloudflared.exe

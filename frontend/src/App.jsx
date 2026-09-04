@@ -1,423 +1,135 @@
 import React, { useState, useEffect } from 'react';
-import {
-  FileSearch,
-  Play,
-  Sparkles,
-  ShieldCheck,
-  Menu,
-  Plus,
-  FileSpreadsheet,
-  Activity,
-  Shield
-} from 'lucide-react';
+import Header from './components/Header';
+import CommandBar from './components/CommandBar';
 import Sidebar from './components/Sidebar';
-import KpiRibbon from './components/KpiRibbon';
-import ClaimInspector from './components/ClaimInspector';
-import PredictionCard from './components/PredictionCard';
-import RiskFactorsList from './components/RiskFactorsList';
-import RecommendationBox from './components/RecommendationBox';
-import WhatIfPlayground from './components/WhatIfPlayground';
-import ClaimQueue from './components/ClaimQueue';
-import ModelAnalyticsModal from './components/ModelAnalyticsModal';
-import BatchUploadModal from './components/BatchUploadModal';
-import RecentClaimsCard from './components/RecentClaimsCard';
-import { DEMO_PRESETS, BLANK_CLAIM } from './utils/constants';
-import api from './api/client';
+import ClaimStudio from './components/Studio/ClaimStudio';
+import EdiFullPage from './components/EDI/EdiFullPage';
+import ClaimQueue from './components/Queue/ClaimQueue';
+import MetricsDashboard from './components/Intelligence/MetricsDashboard';
+import BatchAnalysis from './components/Batch/BatchAnalysis';
+import PolicyNetwork from './components/Network/PolicyNetwork';
+import Toast from './components/Toast';
+import { checkHealth, fetchReferenceTaxonomy } from './api/client';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('dashboard');
-  const [currentClaim, setCurrentClaim] = useState({ ...DEMO_PRESETS[0].data });
-  const [currentPrediction, setCurrentPrediction] = useState(null);
-  const [claimsQueue, setClaimsQueue] = useState([]);
-  const [metrics, setMetrics] = useState(null);
-  const [health, setHealth] = useState(null);
+  const [activePage, setActivePage] = useState('studio');
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [systemHealth, setSystemHealth] = useState(null);
+  const [payers, setPayers] = useState([]);
+  const [reference, setReference] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [toast, setToast] = useState(null);
 
-  const [loading, setLoading] = useState(false);
-  const [queueLoading, setQueueLoading] = useState(false);
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+  };
 
-  // Modals
-  const [isWhatIfOpen, setIsWhatIfOpen] = useState(false);
-  const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false);
-  const [isUploadOpen, setIsUploadOpen] = useState(false);
-
-  // Initial load - loads metrics and queue without auto-triggering prediction to maintain empty dashboard state
   useEffect(() => {
-    loadSystemHealth();
-    loadMetrics();
-    loadClaims();
+    checkHealth().then(setSystemHealth);
+    fetchReferenceTaxonomy()
+      .then((data) => {
+        setReference(data);
+        if (data.payers) setPayers(data.payers);
+      })
+      .catch((err) => console.error('Failed to load taxonomy:', err));
   }, []);
 
-  const loadSystemHealth = async () => {
-    try {
-      const data = await api.getHealth();
-      setHealth(data);
-    } catch (err) {
-      console.warn("Backend health check failed:", err);
-    }
-  };
-
-  const loadMetrics = async () => {
-    try {
-      const data = await api.getMetrics();
-      setMetrics(data);
-    } catch (err) {
-      console.warn("Could not load metrics:", err);
-    }
-  };
-
-  const loadClaims = async () => {
-    setQueueLoading(true);
-    try {
-      const data = await api.getClaimsQueue({ limit: 100 });
-      setClaimsQueue(data.items || []);
-    } catch (err) {
-      console.warn("Could not load claims queue:", err);
-    } finally {
-      setQueueLoading(false);
-    }
-  };
-
-  const handleAnalyze = async (claimToAnalyze) => {
-    setLoading(true);
-    try {
-      const pred = await api.predictClaim(claimToAnalyze);
-      setCurrentPrediction(pred);
-      // Reload queue & metrics to reflect newly scored claim
-      loadMetrics();
-      loadClaims();
-    } catch (err) {
-      console.error("Prediction failed:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSelectFromQueue = (claim) => {
-    setCurrentClaim({
-      claim_id: claim.claim_id,
-      patient_id: claim.patient_id,
-      payer_id: claim.payer_id,
-      cpt_codes: claim.cpt_codes,
-      icd_codes: claim.icd_codes,
-      claim_amount: claim.claim_amount,
-      service_date: claim.service_date,
-      submission_date: claim.submission_date,
-      prior_auth_flag: claim.prior_auth_flag,
-      eligibility_verified: claim.eligibility_verified,
-      days_since_eligibility_check: claim.days_since_eligibility_check,
-      provider_specialty: claim.provider_specialty,
-      documentation_complete: claim.documentation_complete ?? true,
-      duplicate_candidate: claim.duplicate_candidate ?? false,
-      timely_filing_risk: claim.timely_filing_risk ?? false
-    });
-    setActiveTab('dashboard');
-    handleAnalyze(claim);
-  };
-
-  const handleApplyFix = (fixedClaim) => {
-    setCurrentClaim(fixedClaim);
-    handleAnalyze(fixedClaim);
-  };
-
-  const handleReset = () => {
-    setCurrentPrediction(null);
-    setCurrentClaim({ ...BLANK_CLAIM });
-  };
-
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-950 text-slate-100">
-      {/* Sidebar Navigation modeled after claimsai.work */}
-      <Sidebar
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        isOpen={isMobileSidebarOpen}
-        onClose={() => setIsMobileSidebarOpen(false)}
-        health={health}
-        onOpenWhatIf={() => setIsWhatIfOpen(true)}
-        onOpenUpload={() => setIsUploadOpen(true)}
+    <div className="min-h-screen cyber-grid-bg text-slate-100 flex flex-col font-sans selection:bg-cyan-500 selection:text-black">
+      {/* 1. Futuristic Header */}
+      <Header
+        systemHealth={systemHealth}
+        isCollapsed={isSidebarCollapsed}
+        setIsCollapsed={setIsSidebarCollapsed}
       />
 
-      {/* Main Viewport */}
-      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
-        {/* Mobile Top Bar */}
-        <header className="lg:hidden flex items-center justify-between px-4 py-3 border-b border-slate-800 bg-slate-900 shrink-0">
-          <div className="flex items-center gap-2.5">
-            <button
-              onClick={() => setIsMobileSidebarOpen(true)}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
-              aria-label="Open navigation menu"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
-            <div className="flex items-center gap-1.5">
-              <Shield className="w-4 h-4 text-sky-400" />
-              <span className="font-bold text-sm text-white">ClaimShield AI</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => {
-                setActiveTab('dashboard');
-                handleReset();
-              }}
-              className="px-2.5 py-1 rounded-lg bg-sky-500 text-white text-xs font-semibold flex items-center gap-1 cursor-pointer"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              New
-            </button>
-          </div>
-        </header>
+      {/* 2. Facility Context & Real-Time Telemetry Bar */}
+      <CommandBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 
-        {/* Desktop Top Canvas Header modeled after claimsai.work */}
-        <header className="hidden lg:flex items-center justify-between px-8 py-4 border-b border-slate-800/80 bg-slate-900/40 backdrop-blur sticky top-0 z-20 shrink-0">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight text-white">
-              {activeTab === 'queue' ? 'Claims Work Queue' : activeTab === 'analytics' ? 'Model Transparency & SHAP' : 'Dashboard'}
-            </h1>
-            <p className="text-xs text-slate-400 mt-0.5">
-              {activeTab === 'queue'
-                ? 'Operational worklist for billing specialists prior to EDI 837 batch release'
-                : activeTab === 'analytics'
-                ? 'Pre-submission denial model validation, calibration curve, and SHAP attribution'
-                : 'Claims denial triage & pre-submission prevention overview'}
-            </p>
-          </div>
+      {/* 3. Main Cockpit Layout: Left Sidebar + Right Dedicated Page Viewport */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Futuristic Collapsible Sidebar */}
+        <Sidebar
+          activePage={activePage}
+          setActivePage={setActivePage}
+          isCollapsed={isSidebarCollapsed}
+          setIsCollapsed={setIsSidebarCollapsed}
+          systemHealth={systemHealth}
+        />
 
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setIsUploadOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 bg-slate-900 hover:bg-slate-800 border border-slate-700 transition cursor-pointer"
-              title="Upload synthetic CSV for batch pre-submission scoring"
-            >
-              <FileSpreadsheet className="w-3.5 h-3.5 text-sky-400" />
-              Batch CSV
-            </button>
-
-            <button
-              onClick={() => {
-                setActiveTab('dashboard');
-                handleReset();
-              }}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-sky-500 hover:bg-sky-400 shadow-sm shadow-sky-500/20 transition cursor-pointer"
-            >
-              <Plus className="w-4 h-4" />
-              New Claim
-            </button>
-
-            <div className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs">
-              <span className="relative flex h-2 w-2">
-                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
-                  health?.model_loaded ? 'bg-emerald-400' : 'bg-rose-400'
-                }`} />
-                <span className={`relative inline-flex rounded-full h-2 w-2 ${
-                  health?.model_loaded ? 'bg-emerald-500' : 'bg-rose-500'
-                }`} />
-              </span>
-              <span className="font-mono text-[11px] text-slate-400">
-                {health?.model_loaded ? (health.model_version || 'rf-calibrated-v1.0') : 'Offline'}
-              </span>
-            </div>
-          </div>
-        </header>
-
-        {/* Scrollable Canvas Body */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
-          {/* Executive KPI Ribbon */}
-          <KpiRibbon metrics={metrics} loading={!metrics} />
-
-          {/* Tab 1: Dashboard / Live Claim Intake */}
-          {(activeTab === 'dashboard' || activeTab === 'inspector') && (
-            <div className="space-y-6 animate-fadeIn">
-              {/* Intake Form & Preset Picker */}
-              <ClaimInspector
-                onAnalyze={handleAnalyze}
-                onReset={handleReset}
-                loading={loading}
-                currentClaim={currentClaim}
-                setCurrentClaim={setCurrentClaim}
-              />
-
-              {/* Loading State during analysis */}
-              {loading && (
-                <div
-                  role="status"
-                  data-testid="analysis-loading-state"
-                  className="bg-slate-900/60 border border-slate-800 rounded-2xl p-12 text-center shadow-lg animate-pulse"
-                >
-                  <div className="w-10 h-10 border-3 border-sky-500/30 border-t-sky-400 rounded-full animate-spin mx-auto mb-3" />
-                  <h3 className="text-base font-bold text-white">Analyzing Pre-Submission Claim...</h3>
-                  <p className="text-xs text-slate-400 mt-1">
-                    Evaluating deterministic rules, calculating dual-stage denial risk, and mapping CARC root causes
-                  </p>
-                </div>
-              )}
-
-              {/* Empty Dashboard State (Shown before any claim is analyzed) */}
-              {!currentPrediction && !loading && (
-                <>
-                  <div
-                    role="region"
-                    aria-label="Empty Dashboard State"
-                    data-testid="empty-dashboard-state"
-                    className="bg-slate-900/60 border-2 border-slate-800/80 border-dashed rounded-2xl p-10 text-center shadow-lg animate-fadeIn"
-                  >
-                    <div className="max-w-lg mx-auto space-y-4">
-                      <div className="w-16 h-16 rounded-2xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center mx-auto text-sky-400 shadow-inner">
-                        <FileSearch className="w-8 h-8" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-bold text-white">
-                          Empty Dashboard State — Ready for Claim Analysis
-                        </h3>
-                        <p className="text-xs text-slate-300 mt-1.5 leading-relaxed">
-                          The dashboard presents a clean, empty state ready for submission analysis.
-                          Select one of the 1-click presets above or enter custom claim parameters, then click{' '}
-                          <strong className="text-sky-300">Start New Claim Analysis</strong>.
-                        </p>
-                      </div>
-
-                      <div className="pt-2">
-                        <button
-                          type="button"
-                          data-testid="start-analysis-btn"
-                          onClick={() => {
-                            const claimToAnalyze = (currentClaim.claim_id && currentClaim.cpt_codes && currentClaim.cpt_codes.length > 0)
-                              ? currentClaim
-                              : { ...DEMO_PRESETS[0].data };
-                            if (!currentClaim.claim_id) {
-                              setCurrentClaim(claimToAnalyze);
-                            }
-                            handleAnalyze(claimToAnalyze);
-                          }}
-                          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-sky-500/30 transition-all cursor-pointer"
-                        >
-                          <Play className="w-3.5 h-3.5 fill-white" />
-                          Start New Claim Analysis
-                        </button>
-                      </div>
-
-                      <div className="grid grid-cols-3 gap-3 pt-4 border-t border-slate-800 text-[11px] text-slate-400">
-                        <div className="p-2 rounded-lg bg-slate-950/50 border border-slate-800/80">
-                          <span className="block font-semibold text-sky-300">Deterministic</span>
-                          <span>Hard check guardrails</span>
-                        </div>
-                        <div className="p-2 rounded-lg bg-slate-950/50 border border-slate-800/80">
-                          <span className="block font-semibold text-indigo-300">Dual-Stage ML</span>
-                          <span>Calibrated risk score</span>
-                        </div>
-                        <div className="p-2 rounded-lg bg-slate-950/50 border border-slate-800/80">
-                          <span className="block font-semibold text-amber-300">CARC Attribution</span>
-                          <span>Root cause explanation</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Recent Claims Triage Card modeled after claimsai.work */}
-                  <RecentClaimsCard
-                    claims={claimsQueue}
-                    loading={queueLoading}
-                    onSelectClaim={handleSelectFromQueue}
-                    onViewAll={() => setActiveTab('queue')}
-                  />
-                </>
-              )}
-
-              {/* Bottom: Prediction, Explanations, and Recommendation */}
-              {currentPrediction && !loading && (
-                <div className="space-y-6">
-                  {/* Disposition & Risk Gauge Card */}
-                  <PredictionCard
-                    prediction={currentPrediction}
-                    onOpenWhatIf={() => setIsWhatIfOpen(true)}
-                  />
-
-                  {/* 2-Column Grid: Billing Risk Factors & Prescriptive Recommendations */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                    <RiskFactorsList factors={currentPrediction.top_3_risk_factors} />
-                    <RecommendationBox
-                      action={currentPrediction.recommended_action}
-                      routingDecision={currentPrediction.routing_decision}
-                    />
-                  </div>
-
-                  {/* Recent Claims Triage Card */}
-                  <RecentClaimsCard
-                    claims={claimsQueue}
-                    loading={queueLoading}
-                    onSelectClaim={handleSelectFromQueue}
-                    onViewAll={() => setActiveTab('queue')}
-                  />
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Tab 2: Claims Queue */}
-          {activeTab === 'queue' && (
-            <div className="animate-fadeIn">
-              <ClaimQueue
-                claims={claimsQueue}
-                loading={queueLoading}
-                onSelectClaim={handleSelectFromQueue}
-                onRefresh={loadClaims}
-              />
-            </div>
-          )}
-
-          {/* Tab 3: Model Analytics */}
-          {activeTab === 'analytics' && (
-            <div className="animate-fadeIn">
-              <ModelAnalyticsModal
-                metrics={metrics}
-                onClose={() => setActiveTab('dashboard')}
-              />
-            </div>
-          )}
-
-          {/* Footer */}
-          <footer className="border-t border-slate-800/80 py-4 mt-8">
-            <div className="text-center text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2">
-              <div>
-                <span className="font-bold text-slate-300">ClaimShield AI</span> — Pre-Submission RCM Denial Prevention Engine
+        {/* Right Dynamic Page Viewport */}
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 custom-scrollbar">
+          <div className="max-w-7xl mx-auto">
+            {/* Page 1: Quantum Studio */}
+            {activePage === 'studio' && (
+              <div key="studio" className="animate-page-enter">
+                <ClaimStudio
+                  payers={payers}
+                  reference={reference}
+                  onClaimAnalyzed={() => {}}
+                  onToast={showToast}
+                />
               </div>
-              <div className="font-mono text-[11px] text-amber-400">
-                SIMULATED / DEMO DATA ONLY — Not clinically validated or payer certified
+            )}
+
+            {/* Page 2: Dedicated EDI 837P Terminal & Scrubber */}
+            {activePage === 'edi' && (
+              <div key="edi" className="animate-page-enter">
+                <EdiFullPage onToast={showToast} />
               </div>
-              <div>
-                Microsoft Innovation Club (VIT Chennai)
+            )}
+
+            {/* Page 3: Defense Worklist Queue */}
+            {activePage === 'queue' && (
+              <div key="queue" className="animate-page-enter">
+                <ClaimQueue onToast={showToast} />
               </div>
-            </div>
-          </footer>
+            )}
+
+            {/* Page 4: Neural Intelligence & ROI Model */}
+            {activePage === 'intelligence' && (
+              <div key="intelligence" className="animate-page-enter">
+                <MetricsDashboard />
+              </div>
+            )}
+
+            {/* Page 5: High-Throughput Batch Screener */}
+            {activePage === 'batch' && (
+              <div key="batch" className="animate-page-enter">
+                <BatchAnalysis onToast={showToast} />
+              </div>
+            )}
+
+            {/* Page 6: Payer Policy Network */}
+            {activePage === 'network' && (
+              <div key="network" className="animate-page-enter">
+                <PolicyNetwork />
+              </div>
+            )}
+          </div>
         </main>
       </div>
 
-      {/* What-If Modal */}
-      {isWhatIfOpen && currentClaim && (
-        <WhatIfPlayground
-          claim={currentClaim}
-          onApplyFix={handleApplyFix}
-          onClose={() => setIsWhatIfOpen(false)}
-        />
-      )}
+      {/* 4. Cyber Footer */}
+      <footer className="border-t border-cyber-border/80 bg-cyber-dark/90 py-3 text-center text-xs text-slate-500">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <div className="flex items-center space-x-1.5 text-slate-400">
+            <span className="font-bold text-slate-200 uppercase tracking-wider">ClaimShield AI 2050 Cockpit</span>
+            <span>—</span>
+            <span>Microsoft Innovation Club (VIT Chennai)</span>
+          </div>
+          <div className="text-[11px] font-mono text-slate-500">
+            100% Offline Local Architecture • Synthetic Claims Only • No Real PHI Used
+          </div>
+        </div>
+      </footer>
 
-      {/* Analytics Modal */}
-      {isAnalyticsOpen && (
-        <ModelAnalyticsModal
-          metrics={metrics}
-          onClose={() => setIsAnalyticsOpen(false)}
-        />
-      )}
-
-      {/* Batch Upload Modal */}
-      {isUploadOpen && (
-        <BatchUploadModal
-          onClose={() => setIsUploadOpen(false)}
-          onSuccess={() => {
-            loadClaims();
-            loadMetrics();
-          }}
+      {/* 5. Active Toast Notifications */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
         />
       )}
     </div>

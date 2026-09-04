@@ -1,202 +1,224 @@
-import React from 'react';
-import {
-  LayoutDashboard,
-  FileText,
-  Database,
-  Sliders,
-  BarChart3,
-  FileSpreadsheet,
-  Shield,
-  X
+import React, { useState } from 'react';
+import { 
+  Sparkles, 
+  Terminal, 
+  Layers, 
+  BarChart3, 
+  UploadCloud, 
+  Network, 
+  ChevronLeft, 
+  ChevronRight, 
+  Volume2, 
+  VolumeX, 
+  Activity, 
+  ShieldCheck, 
+  Cpu
 } from 'lucide-react';
+import { cyberAudio } from '../utils/audio';
 
-export default function Sidebar({
-  activeTab,
-  setActiveTab,
-  isOpen,
-  onClose,
-  health,
-  onOpenWhatIf,
-  onOpenUpload
-}) {
+export default function Sidebar({ activePage, setActivePage, isCollapsed, setIsCollapsed, systemHealth }) {
+  const [muted, setMuted] = useState(cyberAudio.isMuted());
+
   const navItems = [
     {
-      id: 'dashboard',
-      label: 'Dashboard',
-      icon: LayoutDashboard,
-      onClick: () => {
-        setActiveTab('dashboard');
-        if (onClose) onClose();
-      },
-      isActive: activeTab === 'dashboard'
+      id: 'studio',
+      label: 'Quantum Studio',
+      sublabel: 'Live Pre-Submission HUD',
+      icon: Sparkles,
+      badge: 'LIVE'
     },
     {
-      id: 'inspector',
-      label: 'Claims Intake',
-      icon: FileText,
-      onClick: () => {
-        setActiveTab('inspector');
-        if (onClose) onClose();
-      },
-      isActive: activeTab === 'inspector'
+      id: 'edi',
+      label: 'EDI 837P Cyber Terminal',
+      sublabel: 'X12 Stream & Scrubber',
+      icon: Terminal,
+      badge: 'EDI 5010'
     },
     {
       id: 'queue',
-      label: 'Work Queue',
-      icon: Database,
-      onClick: () => {
-        setActiveTab('queue');
-        if (onClose) onClose();
-      },
-      isActive: activeTab === 'queue'
+      label: 'Defense Worklist',
+      sublabel: 'SLA Queue & Adjudication',
+      icon: Layers,
+      badge: null
     },
     {
-      id: 'whatif',
-      label: 'What-If Remediation',
-      icon: Sliders,
-      onClick: () => {
-        if (onOpenWhatIf) onOpenWhatIf();
-        if (onClose) onClose();
-      },
-      isActive: false
-    },
-    {
-      id: 'analytics',
-      label: 'ML Transparency',
+      id: 'intelligence',
+      label: 'Neural Intelligence',
+      sublabel: 'Confusion Matrix & ROI',
       icon: BarChart3,
-      onClick: () => {
-        setActiveTab('analytics');
-        if (onClose) onClose();
-      },
-      isActive: activeTab === 'analytics'
+      badge: '76.0%'
     },
     {
       id: 'batch',
-      label: 'Batch CSV',
-      icon: FileSpreadsheet,
-      onClick: () => {
-        if (onOpenUpload) onOpenUpload();
-        if (onClose) onClose();
-      },
-      isActive: false
+      label: 'Batch Screener',
+      sublabel: 'High-Throughput Audit',
+      icon: UploadCloud,
+      badge: null
+    },
+    {
+      id: 'network',
+      label: 'Payer Policy Network',
+      sublabel: 'Rules Graph & CARC Taxonomy',
+      icon: Network,
+      badge: 'Graph'
     }
   ];
 
-  const sidebarContent = (
-    <div className="flex flex-col h-full bg-slate-900 text-slate-300 select-none">
-      {/* Brand Header */}
-      <div className="px-6 py-5 border-b border-slate-800 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400 shadow-sm shadow-sky-500/20">
-            <Shield className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-sm font-bold tracking-tight text-white">ClaimShield</span>
-              <span className="px-1 py-0.2 rounded text-[10px] font-extrabold bg-sky-500/20 text-sky-400 border border-sky-500/30">
-                AI
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-400 font-medium">Fraud & Denial Prevention</p>
-          </div>
-        </div>
+  const handleNavClick = (id) => {
+    cyberAudio.playChirp();
+    setActivePage(id);
+  };
 
-        {/* Mobile close button */}
-        {onClose && (
-          <button
-            onClick={onClose}
-            className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
-            aria-label="Close sidebar"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        )}
-      </div>
-
-      {/* Navigation List */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        <div className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-          Navigation
-        </div>
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          return (
-            <button
-              key={item.id}
-              onClick={item.onClick}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
-                item.isActive
-                  ? 'bg-sky-500/15 text-sky-300 font-semibold border-r-2 border-sky-400 shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-              }`}
-            >
-              <Icon className={`w-4 h-4 ${item.isActive ? 'text-sky-400' : 'text-slate-400'}`} />
-              <span>{item.label}</span>
-            </button>
-          );
-        })}
-      </nav>
-
-      {/* Footer / Profile & Engine Health */}
-      <div className="p-4 border-t border-slate-800 space-y-3 bg-slate-900/80">
-        {/* User / Adjudicator Card */}
-        <div className="flex items-center gap-3 px-1">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-sky-600 to-indigo-600 flex items-center justify-center shrink-0 text-xs font-bold text-white shadow-sm">
-            CS
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold truncate text-white">RCM Adjudicator</p>
-            <p className="text-[10px] text-slate-400 truncate">adjudicator@claimshield.ai</p>
-          </div>
-        </div>
-
-        {/* Engine Status Badge */}
-        <div className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-slate-950/60 border border-slate-800 text-[10px]">
-          <div className="flex items-center gap-2">
-            <span className="relative flex h-2 w-2">
-              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
-                health?.model_loaded ? 'bg-emerald-400' : 'bg-rose-400'
-              }`} />
-              <span className={`relative inline-flex rounded-full h-2 w-2 ${
-                health?.model_loaded ? 'bg-emerald-500' : 'bg-rose-500'
-              }`} />
-            </span>
-            <span className="font-mono text-slate-300">
-              {health?.model_loaded ? (health.model_version || 'rf-calibrated-v1.0') : 'Model Offline'}
-            </span>
-          </div>
-          <span className="font-semibold uppercase tracking-wider text-[9px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
-            Active
-          </span>
-        </div>
-
-        {/* Attribution */}
-        <div className="text-[10px] text-slate-500 text-center font-medium">
-          Microsoft Innovation Club • VIT Chennai
-        </div>
-      </div>
-    </div>
-  );
+  const handleToggleMute = () => {
+    const isNowMuted = cyberAudio.toggleMute();
+    setMuted(isNowMuted);
+    if (!isNowMuted) {
+      cyberAudio.playChirp();
+    }
+  };
 
   return (
-    <>
-      {/* Desktop Persistent Sidebar */}
-      <aside className="hidden lg:flex flex-col w-64 border-r border-slate-800 shrink-0 h-screen sticky top-0">
-        {sidebarContent}
-      </aside>
+    <aside
+      className={`bg-cyber-dark/95 border-r border-cyber-border/80 backdrop-blur-2xl transition-all duration-300 flex flex-col justify-between z-40 select-none ${
+        isCollapsed ? 'w-20' : 'w-72'
+      }`}
+    >
+      {/* 1. Brand / Core Logo Area */}
+      <div>
+        <div className="p-4 border-b border-cyber-border/80 flex items-center justify-between">
+          <div className="flex items-center space-x-3 overflow-hidden">
+            {/* Animated Neural Core Icon */}
+            <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 via-indigo-600 to-cyan-400 p-0.5 shadow-lg shadow-cyan-500/20 shrink-0 group">
+              <div className="w-full h-full bg-cyber-bg rounded-[10px] flex items-center justify-center relative overflow-hidden">
+                <ShieldCheck className="w-5 h-5 text-cyan-400 animate-pulse" />
+                <span className="absolute inset-0 border border-cyan-400/40 rounded-[10px] animate-ping opacity-20 pointer-events-none" />
+              </div>
+            </div>
 
-      {/* Mobile Slide-over Drawer */}
-      {isOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
-            onClick={onClose}
-          />
-          <div className="fixed inset-y-0 left-0 w-64 max-w-[80vw] shadow-2xl z-50">
-            {sidebarContent}
+            {!isCollapsed && (
+              <div className="truncate">
+                <div className="flex items-center space-x-1.5">
+                  <span className="font-extrabold text-sm tracking-wider text-slate-100 uppercase">
+                    Claim<span className="text-cyan-400">Shield</span>
+                  </span>
+                  <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                    AI 2050
+                  </span>
+                </div>
+                <p className="text-[10px] text-slate-400 truncate">
+                  Pre-Submission Neural Engine
+                </p>
+              </div>
+            )}
           </div>
+
+          {/* Collapse / Expand Toggle */}
+          <button
+            onClick={() => {
+              cyberAudio.playChirp();
+              setIsCollapsed(!isCollapsed);
+            }}
+            className="p-1.5 rounded-lg bg-cyber-card/80 hover:bg-slate-800 text-slate-400 hover:text-cyan-400 border border-cyber-border/80 transition-colors"
+            title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
+          >
+            {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+          </button>
         </div>
-      )}
-    </>
+
+        {/* 2. Navigation Items List */}
+        <nav className="p-3 space-y-1.5">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activePage === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => handleNavClick(item.id)}
+                className={`w-full flex items-center rounded-xl transition-all duration-200 group relative ${
+                  isCollapsed ? 'justify-center p-3' : 'justify-between px-3.5 py-3'
+                } ${
+                  isActive
+                    ? 'bg-gradient-to-r from-cyan-500/20 to-indigo-500/10 text-cyan-300 border border-cyan-500/60 shadow-lg shadow-cyan-500/10'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-cyber-card/60 border border-transparent'
+                }`}
+                title={isCollapsed ? item.label : undefined}
+              >
+                <div className="flex items-center space-x-3 truncate">
+                  <div className={`p-1.5 rounded-lg transition-transform duration-200 group-hover:scale-110 ${
+                    isActive ? 'bg-cyan-500/20 text-cyan-400' : 'bg-slate-800/80 text-slate-400'
+                  }`}>
+                    <Icon className="w-4 h-4" />
+                  </div>
+
+                  {!isCollapsed && (
+                    <div className="text-left truncate">
+                      <div className={`text-xs font-bold leading-tight ${isActive ? 'text-cyan-200' : 'text-slate-200'}`}>
+                        {item.label}
+                      </div>
+                      <div className="text-[10px] text-slate-500 font-medium truncate">
+                        {item.sublabel}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {!isCollapsed && item.badge && (
+                  <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold border shrink-0 ${
+                    isActive
+                      ? 'bg-cyan-400/20 text-cyan-200 border-cyan-400/40'
+                      : 'bg-slate-800 text-slate-400 border-slate-700'
+                  }`}>
+                    {item.badge}
+                  </span>
+                )}
+
+                {/* Glowing Active Left Edge Notch */}
+                {isActive && (
+                  <span className="absolute left-0 top-2 bottom-2 w-1 bg-cyan-400 rounded-r shadow-md shadow-cyan-400" />
+                )}
+              </button>
+            );
+          })}
+        </nav>
+      </div>
+
+      {/* 3. Bottom Telemetry & Audio Control */}
+      <div className="p-3 border-t border-cyber-border/80 space-y-2.5">
+        {/* Telemetry Status Widget */}
+        {!isCollapsed && (
+          <div className="p-2.5 bg-cyber-bg/80 rounded-xl border border-cyber-border/80 text-[10px] font-mono space-y-1">
+            <div className="flex items-center justify-between text-slate-400">
+              <span className="flex items-center space-x-1">
+                <Activity className="w-3 h-3 text-cyan-400" />
+                <span>Clearinghouse EDI Link</span>
+              </span>
+              <span className="text-emerald-400 font-bold">ONLINE</span>
+            </div>
+            <div className="flex items-center justify-between text-slate-500">
+              <span>Engine Spec</span>
+              <span className="text-slate-300">FastAPI • Scikit 3.14</span>
+            </div>
+          </div>
+        )}
+
+        {/* Audio Mute & Info Strip */}
+        <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} text-xs text-slate-400`}>
+          <button
+            onClick={handleToggleMute}
+            className="flex items-center space-x-1.5 p-2 rounded-lg bg-cyber-card/80 hover:bg-slate-800 text-slate-300 hover:text-cyan-400 border border-cyber-border/80 transition-colors"
+            title={muted ? 'Unmute Cyber Audio' : 'Mute Cyber Audio'}
+          >
+            {muted ? <VolumeX className="w-3.5 h-3.5 text-rose-400" /> : <Volume2 className="w-3.5 h-3.5 text-cyan-400" />}
+            {!isCollapsed && <span>{muted ? 'Audio Muted' : 'Cyber FX Active'}</span>}
+          </button>
+
+          {!isCollapsed && (
+            <span className="text-[10px] font-mono text-slate-500">
+              v2.4-PRO
+            </span>
+          )}
+        </div>
+      </div>
+    </aside>
   );
 }
