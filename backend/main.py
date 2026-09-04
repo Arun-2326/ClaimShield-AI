@@ -60,14 +60,22 @@ async def generic_exception_handler(request: Request, exc: Exception):
 
 from backend.routers import predict, claims, outcomes, reference, scrubber
 
-# Include Routers
+# Include Routers at root
 app.include_router(predict.router)
 app.include_router(claims.router)
 app.include_router(outcomes.router)
 app.include_router(reference.router)
 app.include_router(scrubber.router)
 
+# Also Include Routers with /api prefix for frontend client compatibility
+app.include_router(predict.router, prefix="/api")
+app.include_router(claims.router, prefix="/api")
+app.include_router(outcomes.router, prefix="/api")
+app.include_router(reference.router, prefix="/api")
+app.include_router(scrubber.router, prefix="/api")
+
 @app.get("/health", tags=["Health"])
+@app.get("/api/health", tags=["Health"])
 def health_check():
     model_service = ModelService.get_instance()
     return {
@@ -84,4 +92,5 @@ from fastapi.staticfiles import StaticFiles
 frontend_dist = BASE_DIR / "frontend" / "dist"
 if frontend_dist.exists():
     app.mount("/", StaticFiles(directory=str(frontend_dist), html=True), name="static")
+
 
