@@ -17,7 +17,9 @@ const SPECIALTY_OPTIONS = [
 ];
 
 export default function ClaimInspector({ onAnalyze, onReset, loading, currentClaim, setCurrentClaim }) {
-  const [activePresetId, setActivePresetId] = useState(null);
+  const [activePresetId, setActivePresetId] = useState(
+    currentClaim?.claim_id === "CLM_DEMO_01" ? "preset_missing_auth" : null
+  );
 
   const handleSelectPreset = (preset) => {
     setActivePresetId(preset.id);
@@ -62,7 +64,7 @@ export default function ClaimInspector({ onAnalyze, onReset, loading, currentCla
             Presets:
           </span>
           {DEMO_PRESETS.map((p) => {
-            const isSelected = activePresetId === p.id;
+            const isSelected = Boolean(currentClaim?.claim_id) && activePresetId === p.id;
             return (
               <button
                 key={p.id}

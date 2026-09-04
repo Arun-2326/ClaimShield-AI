@@ -15,7 +15,7 @@ import api from './api/client';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('inspector');
-  const [currentClaim, setCurrentClaim] = useState({ ...BLANK_CLAIM });
+  const [currentClaim, setCurrentClaim] = useState({ ...DEMO_PRESETS[0].data });
   const [currentPrediction, setCurrentPrediction] = useState(null);
   const [claimsQueue, setClaimsQueue] = useState([]);
   const [metrics, setMetrics] = useState(null);
