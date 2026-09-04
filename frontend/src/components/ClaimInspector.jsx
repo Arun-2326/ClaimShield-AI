@@ -88,6 +88,11 @@ export default function ClaimInspector({ onAnalyze, onReset, loading, currentCla
           e.preventDefault();
           onAnalyze(currentClaim);
         }}
+        onReset={(e) => {
+          e.preventDefault();
+          setActivePresetId(null);
+          if (onReset) onReset();
+        }}
         className="mt-4 space-y-4"
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -96,10 +101,10 @@ export default function ClaimInspector({ onAnalyze, onReset, loading, currentCla
             <label className="block text-xs font-medium text-slate-400 mb-1">Claim ID</label>
             <input
               type="text"
-              value={currentClaim.claim_id || ""}
+              value={currentClaim.claim_id ?? ""}
               onChange={(e) => handleInputChange("claim_id", e.target.value)}
+              placeholder="e.g. CLM_1001"
               className="w-full bg-slate-900/90 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono focus:border-sky-500 focus:outline-none"
-              required
             />
           </div>
 
@@ -108,10 +113,10 @@ export default function ClaimInspector({ onAnalyze, onReset, loading, currentCla
             <label className="block text-xs font-medium text-slate-400 mb-1">Patient ID (Opaque)</label>
             <input
               type="text"
-              value={currentClaim.patient_id || ""}
+              value={currentClaim.patient_id ?? ""}
               onChange={(e) => handleInputChange("patient_id", e.target.value)}
+              placeholder="e.g. PAT_2001"
               className="w-full bg-slate-900/90 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono focus:border-sky-500 focus:outline-none"
-              required
             />
           </div>
 
@@ -164,10 +169,10 @@ export default function ClaimInspector({ onAnalyze, onReset, loading, currentCla
             <input
               type="number"
               step="0.01"
-              value={currentClaim.claim_amount !== undefined ? currentClaim.claim_amount : 150}
-              onChange={(e) => handleInputChange("claim_amount", parseFloat(e.target.value) || 0)}
+              value={currentClaim.claim_amount !== undefined && currentClaim.claim_amount !== null ? currentClaim.claim_amount : ""}
+              onChange={(e) => handleInputChange("claim_amount", e.target.value === "" ? "" : parseFloat(e.target.value) || 0)}
+              placeholder="0.00"
               className="w-full bg-slate-900/90 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono focus:border-sky-500 focus:outline-none"
-              required
             />
           </div>
 
@@ -179,7 +184,6 @@ export default function ClaimInspector({ onAnalyze, onReset, loading, currentCla
               value={currentClaim.service_date || ""}
               onChange={(e) => handleInputChange("service_date", e.target.value)}
               className="w-full bg-slate-900/90 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-sky-500 focus:outline-none"
-              required
             />
           </div>
         </div>
@@ -214,8 +218,9 @@ export default function ClaimInspector({ onAnalyze, onReset, loading, currentCla
             <input
               type="number"
               min="0"
-              value={currentClaim.days_since_eligibility_check ?? 0}
-              onChange={(e) => handleInputChange("days_since_eligibility_check", parseInt(e.target.value) || 0)}
+              value={currentClaim.days_since_eligibility_check !== undefined && currentClaim.days_since_eligibility_check !== null ? currentClaim.days_since_eligibility_check : ""}
+              onChange={(e) => handleInputChange("days_since_eligibility_check", e.target.value === "" ? "" : parseInt(e.target.value) || 0)}
+              placeholder="0"
               className="w-16 bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-white text-center font-mono focus:outline-none"
             />
             <span className="text-xs text-slate-400">days since 270 check</span>
@@ -268,15 +273,16 @@ export default function ClaimInspector({ onAnalyze, onReset, loading, currentCla
               <button
                 type="button"
                 data-testid="reset-claim-btn"
+                aria-label="Reset the claim intake form to an empty state"
                 onClick={() => {
                   setActivePresetId(null);
                   onReset();
                 }}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900/80 hover:bg-slate-700/80 text-slate-300 hover:text-white border border-slate-700 text-xs font-semibold transition-all cursor-pointer"
-                title="Reset form to empty dashboard state"
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900/80 hover:bg-slate-700/80 text-slate-300 hover:text-white border border-slate-700 text-xs font-semibold transition-all cursor-pointer"
+                title="Reset the claim intake form to an empty state"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
-                New / Empty State
+                Reset Form
               </button>
             )}
 

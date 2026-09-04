@@ -10,12 +10,12 @@ import WhatIfPlayground from './components/WhatIfPlayground';
 import ClaimQueue from './components/ClaimQueue';
 import ModelAnalyticsModal from './components/ModelAnalyticsModal';
 import BatchUploadModal from './components/BatchUploadModal';
-import { DEMO_PRESETS } from './utils/constants';
+import { DEMO_PRESETS, BLANK_CLAIM } from './utils/constants';
 import api from './api/client';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('inspector');
-  const [currentClaim, setCurrentClaim] = useState({ ...DEMO_PRESETS[0].data });
+  const [currentClaim, setCurrentClaim] = useState({ ...BLANK_CLAIM });
   const [currentPrediction, setCurrentPrediction] = useState(null);
   const [claimsQueue, setClaimsQueue] = useState([]);
   const [metrics, setMetrics] = useState(null);
@@ -110,7 +110,7 @@ export default function App() {
 
   const handleReset = () => {
     setCurrentPrediction(null);
-    setCurrentClaim({ ...DEMO_PRESETS[0].data });
+    setCurrentClaim({ ...BLANK_CLAIM });
   };
 
   return (
@@ -183,7 +183,15 @@ export default function App() {
                     <button
                       type="button"
                       data-testid="start-analysis-btn"
-                      onClick={() => handleAnalyze(currentClaim)}
+                      onClick={() => {
+                        const claimToAnalyze = (currentClaim.claim_id && currentClaim.cpt_codes && currentClaim.cpt_codes.length > 0)
+                          ? currentClaim
+                          : { ...DEMO_PRESETS[0].data };
+                        if (!currentClaim.claim_id) {
+                          setCurrentClaim(claimToAnalyze);
+                        }
+                        handleAnalyze(claimToAnalyze);
+                      }}
                       className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-sky-500/30 transition-all cursor-pointer"
                     >
                       <Play className="w-3.5 h-3.5 fill-white" />

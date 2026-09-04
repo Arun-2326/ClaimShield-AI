@@ -2,6 +2,26 @@
  * ClaimShield AI - Constants & Demo Presets
  */
 
+export const BLANK_CLAIM = {
+  claim_id: "",
+  patient_id: "",
+  payer_id: "PAYER_001",
+  cpt_codes: [],
+  icd_codes: [],
+  claim_amount: "",
+  service_date: "",
+  prior_auth_flag: false,
+  eligibility_verified: false,
+  days_since_eligibility_check: "",
+  provider_specialty: "Family Medicine",
+  documentation_complete: false,
+  duplicate_candidate: false,
+  timely_filing_risk: false,
+  coverage_indicator: false,
+  medical_necessity_indicator: false,
+  bundling_indicator: false
+};
+
 export const CARC_TAXONOMY = {
   "CO-16": {
     code: "CO-16",
