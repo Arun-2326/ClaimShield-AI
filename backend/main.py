@@ -60,7 +60,7 @@ async def generic_exception_handler(request: Request, exc: Exception):
 
 from backend.routers import predict, claims, outcomes, reference, scrubber
 
-# Include Routers at root
+# Include Routers at root (for direct API callers and pytest test suite)
 app.include_router(predict.router)
 app.include_router(claims.router)
 app.include_router(outcomes.router)
