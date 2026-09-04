@@ -51,13 +51,13 @@ export default function PredictionCard({ prediction, onOpenWhatIf }) {
       </div>
 
       {/* Main Stats: Denial Risk Meter & CARC Reason */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
-        {/* Left: Denial Risk Probability Meter */}
-        <div className="bg-slate-900/80 p-4 rounded-xl border border-slate-800 flex flex-col justify-between">
+      <div className="flex flex-col gap-4 mt-4">
+        {/* Denial Risk Probability Meter */}
+        <div className="bg-slate-900/90 p-4 rounded-xl border border-slate-800 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-slate-400">Predicted Denial Risk</span>
-              <span className={`text-2xl font-black font-mono ${config.textClass}`}>
+              <span className={`text-3xl font-black font-mono ${config.textClass}`}>
                 {prediction.risk_score !== undefined ? `${(prediction.risk_score * 100).toFixed(1)}%` : "0.0%"}
               </span>
             </div>
@@ -81,14 +81,14 @@ export default function PredictionCard({ prediction, onOpenWhatIf }) {
             </div>
           </div>
 
-          <div className="mt-3 pt-3 border-t border-slate-800 text-xs text-slate-400">
+          <div className="mt-3 pt-2.5 border-t border-slate-800/80 text-xs text-slate-400">
             <span className="text-slate-300 font-medium">Routing Policy: </span>
             {prediction.routing_reason}
           </div>
         </div>
 
-        {/* Right: Predicted CARC Reason */}
-        <div className="bg-slate-900/80 p-4 rounded-xl border border-slate-800 flex flex-col justify-between">
+        {/* Predicted CARC Reason */}
+        <div className="bg-slate-900/90 p-4 rounded-xl border border-slate-800 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-semibold text-slate-400">Predicted Denial Code (CARC)</span>

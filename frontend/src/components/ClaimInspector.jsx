@@ -22,10 +22,15 @@ const SPECIALTY_OPTIONS = [
 
 export default function ClaimInspector({ onAnalyze, onReset, loading, currentClaim, setCurrentClaim }) {
   const [activePresetId, setActivePresetId] = useState(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const handleSelectPreset = (preset) => {
     setActivePresetId(preset.id);
-    setCurrentClaim({ ...preset.data });
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentClaim({ ...preset.data });
+      setIsTransitioning(false);
+    }, 150);
   };
 
   const handleInputChange = (field, value) => {
@@ -56,8 +61,35 @@ export default function ClaimInspector({ onAnalyze, onReset, loading, currentCla
                   ? Number(currentClaim.days_since_eligibility_check)
                   : "";
 
+  // Dynamic Intelligent Presync Ambient Perimeter Aura
+  const getPresyncAura = () => {
+    if (!currentClaim.claim_id && !currentClaim.claim_amount) {
+      return "border-slate-800/90 shadow-2xl";
+    }
+
+    const isHighRisk = (
+      currentClaim.prior_auth_flag === false && ["PAYER_001", "PAYER_006"].includes(currentClaim.payer_id)
+    ) || currentClaim.timely_filing_risk || activePresetId === "preset_2" || activePresetId === "preset_3";
+
+    if (isHighRisk) {
+      return "border-rose-500/50 glow-crimson ring-1 ring-rose-500/30";
+    }
+
+    const isReview = (
+      currentClaim.eligibility_verified === false ||
+      (currentClaim.days_since_eligibility_check && Number(currentClaim.days_since_eligibility_check) > 30) ||
+      activePresetId === "preset_4" || activePresetId === "preset_5" || activePresetId === "preset_6"
+    );
+
+    if (isReview) {
+      return "border-amber-500/50 glow-amber ring-1 ring-amber-500/30";
+    }
+
+    return "border-emerald-500/50 glow-emerald ring-1 ring-emerald-500/30";
+  };
+
   return (
-    <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-800/90 rounded-2xl p-6 shadow-2xl shadow-black/40 relative overflow-hidden">
+    <div className={`bg-slate-900/80 backdrop-blur-xl rounded-2xl p-6 shadow-2xl transition-all duration-500 relative overflow-hidden ${getPresyncAura()}`}>
       {/* Subtle top surface ambient glow */}
       <div className="absolute top-0 left-1/4 right-1/4 h-[1px] bg-gradient-to-r from-transparent via-sky-500/30 to-transparent pointer-events-none" />
 
@@ -140,12 +172,12 @@ export default function ClaimInspector({ onAnalyze, onReset, loading, currentCla
           setActivePresetId(null);
           if (onReset) onReset();
         }}
-        className="mt-5 space-y-5"
+        className={`mt-5 space-y-5 transition-opacity duration-200 ${isTransitioning ? 'opacity-30' : 'opacity-100'}`}
       >
         {/* Modular Two-Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           {/* LEFT PANEL: Administrative & Identity Data */}
-          <div className="bg-slate-950/50 rounded-xl border border-slate-800/90 p-4 space-y-4">
+          <div className="bg-slate-950/50 rounded-xl border border-slate-800/90 p-5 space-y-4">
             <div className="flex items-center justify-between pb-2 border-b border-slate-800/80">
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400">
@@ -161,10 +193,10 @@ export default function ClaimInspector({ onAnalyze, onReset, loading, currentCla
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Claim ID */}
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
+              <div className="space-y-1">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                   <Hash className="w-3 h-3 text-slate-400" />
                   Claim ID
                 </label>
@@ -173,13 +205,13 @@ export default function ClaimInspector({ onAnalyze, onReset, loading, currentCla
                   value={currentClaim.claim_id ?? ""}
                   onChange={(e) => handleInputChange("claim_id", e.target.value)}
                   placeholder="e.g. CLM_1001"
-                  className="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white font-mono focus:border-sky-500 focus:ring-1 focus:ring-sky-500/30 focus:outline-none transition-all placeholder:text-slate-600"
+                  className="w-full bg-transparent border-0 border-b border-slate-700/80 focus:border-indigo-400 py-1.5 text-sm text-white font-mono focus:ring-0 focus:outline-none transition-colors placeholder:text-slate-600"
                 />
               </div>
 
               {/* Patient ID */}
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
+              <div className="space-y-1">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
                   Patient ID (Opaque)
                 </label>
@@ -188,21 +220,21 @@ export default function ClaimInspector({ onAnalyze, onReset, loading, currentCla
                   value={currentClaim.patient_id ?? ""}
                   onChange={(e) => handleInputChange("patient_id", e.target.value)}
                   placeholder="e.g. PAT_2001"
-                  className="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white font-mono focus:border-sky-500 focus:ring-1 focus:ring-sky-500/30 focus:outline-none transition-all placeholder:text-slate-600"
+                  className="w-full bg-transparent border-0 border-b border-slate-700/80 focus:border-indigo-400 py-1.5 text-sm text-white font-mono focus:ring-0 focus:outline-none transition-colors placeholder:text-slate-600"
                 />
               </div>
             </div>
 
             {/* Destination Payer */}
-            <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
+            <div className="space-y-1">
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                 <Building2 className="w-3 h-3 text-slate-400" />
                 Destination Clearinghouse Payer
               </label>
               <select
                 value={currentClaim.payer_id || "PAYER_001"}
                 onChange={(e) => handleInputChange("payer_id", e.target.value)}
-                className="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-sky-500 focus:ring-1 focus:ring-sky-500/30 focus:outline-none transition-all"
+                className="w-full bg-slate-950 border-0 border-b border-slate-700/80 focus:border-indigo-400 py-1.5 text-sm text-white focus:ring-0 focus:outline-none transition-colors"
               >
                 {PAYER_OPTIONS.map((p) => (
                   <option key={p.id} value={p.id}>{p.id} — {p.name}</option>
@@ -211,15 +243,15 @@ export default function ClaimInspector({ onAnalyze, onReset, loading, currentCla
             </div>
 
             {/* Provider Specialty */}
-            <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
+            <div className="space-y-1">
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                 <Stethoscope className="w-3 h-3 text-slate-400" />
                 Rendering Provider Specialty
               </label>
               <select
                 value={currentClaim.provider_specialty || "Family Medicine"}
                 onChange={(e) => handleInputChange("provider_specialty", e.target.value)}
-                className="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-sky-500 focus:ring-1 focus:ring-sky-500/30 focus:outline-none transition-all"
+                className="w-full bg-slate-950 border-0 border-b border-slate-700/80 focus:border-indigo-400 py-1.5 text-sm text-white focus:ring-0 focus:outline-none transition-colors"
               >
                 {SPECIALTY_OPTIONS.map((spec) => (
                   <option key={spec} value={spec}>{spec}</option>
@@ -229,7 +261,7 @@ export default function ClaimInspector({ onAnalyze, onReset, loading, currentCla
           </div>
 
           {/* RIGHT PANEL: Clinical Coding & Valuation Data */}
-          <div className="bg-slate-950/50 rounded-xl border border-slate-800/90 p-4 space-y-4">
+          <div className="bg-slate-950/50 rounded-xl border border-slate-800/90 p-5 space-y-4">
             <div className="flex items-center justify-between pb-2 border-b border-slate-800/80">
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
@@ -245,10 +277,10 @@ export default function ClaimInspector({ onAnalyze, onReset, loading, currentCla
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* CPT Codes */}
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
+              <div className="space-y-1">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                   <FileCode2 className="w-3 h-3 text-slate-400" />
                   CPT / HCPCS Procedures
                 </label>
@@ -257,13 +289,13 @@ export default function ClaimInspector({ onAnalyze, onReset, loading, currentCla
                   value={(currentClaim.cpt_codes || []).join(", ")}
                   onChange={(e) => handleCptChange(e.target.value)}
                   placeholder="e.g. 29881, 99214"
-                  className="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white font-mono focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 focus:outline-none transition-all placeholder:text-slate-600"
+                  className="w-full bg-transparent border-0 border-b border-slate-700/80 focus:border-indigo-400 py-1.5 text-sm text-white font-mono focus:ring-0 focus:outline-none transition-colors placeholder:text-slate-600"
                 />
               </div>
 
               {/* ICD Codes */}
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
+              <div className="space-y-1">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                   <Activity className="w-3 h-3 text-slate-400" />
                   ICD-10 Diagnoses
                 </label>
@@ -272,18 +304,18 @@ export default function ClaimInspector({ onAnalyze, onReset, loading, currentCla
                   value={(currentClaim.icd_codes || []).join(", ")}
                   onChange={(e) => handleIcdChange(e.target.value)}
                   placeholder="e.g. M17.11, I10"
-                  className="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white font-mono focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 focus:outline-none transition-all placeholder:text-slate-600"
+                  className="w-full bg-transparent border-0 border-b border-slate-700/80 focus:border-indigo-400 py-1.5 text-sm text-white font-mono focus:ring-0 focus:outline-none transition-colors placeholder:text-slate-600"
                 />
               </div>
 
               {/* Billed Amount */}
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
+              <div className="space-y-1">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                   <DollarSign className="w-3 h-3 text-slate-400" />
                   Billed Amount ($ USD)
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 font-mono text-sm">
+                  <div className="absolute inset-y-0 left-0 pl-1 flex items-center pointer-events-none text-slate-500 font-mono text-sm">
                     $
                   </div>
                   <input
@@ -292,14 +324,14 @@ export default function ClaimInspector({ onAnalyze, onReset, loading, currentCla
                     value={currentClaim.claim_amount !== undefined && currentClaim.claim_amount !== null ? currentClaim.claim_amount : ""}
                     onChange={(e) => handleInputChange("claim_amount", e.target.value === "" ? "" : parseFloat(e.target.value) || 0)}
                     placeholder="0.00"
-                    className="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl pl-8 pr-3.5 py-2.5 text-sm text-white font-mono focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 focus:outline-none transition-all placeholder:text-slate-600"
+                    className="w-full bg-transparent border-0 border-b border-slate-700/80 focus:border-indigo-400 pl-6 pr-1 py-1.5 text-sm text-white font-mono focus:ring-0 focus:outline-none transition-colors placeholder:text-slate-600"
                   />
                 </div>
               </div>
 
               {/* Service Date */}
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
+              <div className="space-y-1">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                   <Calendar className="w-3 h-3 text-slate-400" />
                   Date of Service
                 </label>
@@ -307,7 +339,7 @@ export default function ClaimInspector({ onAnalyze, onReset, loading, currentCla
                   type="date"
                   value={currentClaim.service_date || ""}
                   onChange={(e) => handleInputChange("service_date", e.target.value)}
-                  className="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 focus:outline-none transition-all"
+                  className="w-full bg-transparent border-0 border-b border-slate-700/80 focus:border-indigo-400 py-1.5 text-sm text-white focus:ring-0 focus:outline-none transition-colors"
                 />
               </div>
             </div>

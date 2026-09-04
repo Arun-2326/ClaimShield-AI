@@ -12,16 +12,98 @@ code, kbd, samp, pre {
 
 /* Custom modern scrollbars */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0f172a;
+  background: #020617;
 }
 ::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 4px;
+  background: #1e293b;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: #334155;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes checkPop {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes pulseGlowRed {
+  0%, 100% {
+    box-shadow: 0 0 25px rgba(244, 63, 94, 0.12), inset 0 0 15px rgba(244, 63, 94, 0.05);
+  }
+  50% {
+    box-shadow: 0 0 45px rgba(244, 63, 94, 0.28), inset 0 0 25px rgba(244, 63, 94, 0.12);
+  }
+}
+
+@keyframes pulseGlowAmber {
+  0%, 100% {
+    box-shadow: 0 0 25px rgba(245, 158, 11, 0.12), inset 0 0 15px rgba(245, 158, 11, 0.05);
+  }
+  50% {
+    box-shadow: 0 0 45px rgba(245, 158, 11, 0.26), inset 0 0 25px rgba(245, 158, 11, 0.10);
+  }
+}
+
+@keyframes pulseGlowGreen {
+  0%, 100% {
+    box-shadow: 0 0 25px rgba(16, 185, 129, 0.12), inset 0 0 15px rgba(16, 185, 129, 0.05);
+  }
+  50% {
+    box-shadow: 0 0 45px rgba(16, 185, 129, 0.28), inset 0 0 25px rgba(16, 185, 129, 0.12);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+.animate-checkPop {
+  animation: checkPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.glow-crimson {
+  animation: pulseGlowRed 3s infinite ease-in-out;
+}
+
+.glow-amber {
+  animation: pulseGlowAmber 3s infinite ease-in-out;
+}
+
+.glow-emerald {
+  animation: pulseGlowGreen 3s infinite ease-in-out;
 }
